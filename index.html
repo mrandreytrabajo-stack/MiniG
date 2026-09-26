@@ -24,30 +24,17 @@
     h1 { font-size: 2.2rem; color: #f59e0b; margin-bottom: 5px; }
     p.subtitle { color: var(--text-muted); font-size: 1rem; }
 
-    /* Controles de Idioma */
     .lang-selector { display: flex; gap: 8px; background: #1e293b; padding: 6px 12px; border-radius: 10px; border: 1px solid #334155; }
     .lang-btn { background: #334155; color: var(--text); border: 1px solid #475569; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
     .lang-btn:hover { background: #475569; }
     .lang-btn.active { background: #f59e0b; color: #0f172a; border-color: #f59e0b; }
 
-    .btn-back {
-      background: #334155;
-      color: var(--text);
-      border: 1px solid #475569;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-back:hover { background: #475569; border-color: #64748b; }
+    .btn-back { background: #334155; color: var(--text); border: 1px solid #475569; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-back:hover { background: #475569; }
 
-    .section-card { background: var(--card-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); }
+    .section-card { background: var(--card-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
     
     .btn { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; text-align: center; font-size: 1rem; }
     .btn:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-2px); }
@@ -56,7 +43,6 @@
     .btn-p1 { background: var(--p1-color); }
     .btn-p2 { background: var(--p2-color); }
     .btn-pass { background: #64748b; }
-    .btn-pass:hover { background: #475569; }
 
     .cat-card { background: #334155; padding: 15px; border-radius: 10px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; text-align: center; }
     .cat-card:hover { border-color: #f59e0b; transform: scale(1.02); }
@@ -68,7 +54,7 @@
     .item-display { text-align: center; padding: 30px; background: radial-gradient(circle, #334155 0%, #1e293b 100%); border-radius: 16px; border: 2px solid #475569; margin-bottom: 20px; min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .item-icon { font-size: 4rem; margin-bottom: 10px; }
     .item-name { font-size: 2rem; color: #f59e0b; margin-bottom: 10px; }
-    .item-desc { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+    .item-desc { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; }
 
     .players-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
     .player-box { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 3px solid transparent; }
@@ -89,8 +75,6 @@
     #results-screen { display: none; text-align: center; }
     .winner-announcement { font-size: 2rem; color: #f59e0b; margin-bottom: 15px; }
     .explanation-box { background: #334155; padding: 20px; border-radius: 12px; font-size: 1.1rem; line-height: 1.6; margin-bottom: 25px; border-left: 5px solid #f59e0b; text-align: left; }
-
-    .bot-status { font-style: italic; color: #cbd5e1; font-size: 0.9rem; margin-top: 5px; }
 
     .roulette-spin { animation: pulse 0.15s infinite alternate; }
     @keyframes pulse { from { opacity: 0.4; transform: scale(0.98); } to { opacity: 1; transform: scale(1.02); } }
@@ -113,7 +97,6 @@
       </div>
     </div>
 
-    <!-- SELECTOR DE IDIOMA -->
     <div class="lang-selector">
       <button class="lang-btn active" id="lang-es" onclick="changeLanguage('es')">🇪🇸 ES</button>
       <button class="lang-btn" id="lang-en" onclick="changeLanguage('en')">🇬🇧 EN</button>
@@ -131,16 +114,6 @@
         <button class="btn btn-p1 selected" id="btn-mode-2p" onclick="selectMode('2p')">👥 <span id="txt-mode-2p">2 Jugadores (Local)</span></button>
         <button class="btn btn-p2" id="btn-mode-bot" onclick="selectMode('bot')">🤖 <span id="txt-mode-bot">1 Jugador vs SubasBot</span></button>
       </div>
-      
-      <div id="bot-difficulty-section" style="display:none; margin-top: 20px;">
-        <h3 id="txt-bot-diff">Dificultad del SubasBot:</h3>
-        <br>
-        <div class="grid-3">
-          <button class="btn selected" id="diff-easy" onclick="selectDiff('easy')">🟢 <span id="txt-easy">Novato</span></button>
-          <button class="btn" id="diff-medium" onclick="selectDiff('medium')">🟡 <span id="txt-medium">Táctico</span></button>
-          <button class="btn" id="diff-hard" onclick="selectDiff('hard')">🔴 <span id="txt-hard">Maestro</span></button>
-        </div>
-      </div>
     </div>
 
     <div class="section-card">
@@ -154,7 +127,7 @@
   <div id="auction-screen">
     <div class="auction-header">
       <span id="auction-category-title" style="font-size: 1.2rem; font-weight: bold;"></span>
-      <span id="items-left-count" style="color: var(--text-muted);">Lote 1</span>
+      <span id="items-left-count" style="color: var(--text-muted);">Lote</span>
     </div>
 
     <div class="item-display" id="item-display-box">
@@ -169,7 +142,6 @@
     </div>
 
     <div class="players-container">
-      <!-- JUGADOR 1 -->
       <div class="player-box p1" id="p1-box">
         <h3 id="p1-title">Jugador 1</h3>
         <div class="wallet">💰 <span id="p1-money">20</span> €</div>
@@ -184,11 +156,9 @@
         </div>
       </div>
 
-      <!-- JUGADOR 2 / BOT -->
       <div class="player-box p2" id="p2-box">
         <h3 id="p2-title">Jugador 2</h3>
         <div class="wallet">💰 <span id="p2-money">20</span> €</div>
-        <div id="p2-bot-status" class="bot-status" style="display:none;">En espera...</div>
         <div class="controls" id="p2-controls">
           <button class="btn btn-p2" id="p2-btn-1" onclick="playerBid(2, 1)">+1 €</button>
           <button class="btn btn-p2" id="p2-btn-2" onclick="playerBid(2, 2)">+2 €</button>
@@ -231,166 +201,142 @@
   const I18N = {
     es: {
       subtitle: "Compite, puja estratégicamente y crea la colección perfecta",
-      back: "Volver",
-      step1: "1. Elige Modo de Juego",
-      mode2p: "2 Jugadores (Local)",
-      modeBot: "1 Jugador vs SubasBot",
-      botDiff: "Dificultad del SubasBot:",
-      easy: "Novato",
-      medium: "Táctico",
-      hard: "Maestro",
-      step2: "2. Elige la Temática",
-      spinning: "GIRANDO RULETA...",
-      spinningDesc: "¡Buscando el siguiente objeto al azar!",
-      currentBid: "Puja Actual",
-      bidderLabel: "Postor",
-      nobody: "Nadie",
-      p1: "Jugador 1",
-      p2: "Jugador 2",
-      bot: "SubasBot 🤖",
-      pass: "Pasar",
-      yourItems: "Tus Objetos",
-      theirItems: "Sus Objetos",
-      playAgain: "Jugar Otra Partida",
-      winP1: "🏆 ¡Gana Jugador 1!",
-      winP2: "🏆 ¡Gana Jugador 2!",
-      winBot: "🤖 ¡Gana el SubasBot!",
-      draw: "🤝 ¡Empate Técnico!",
-      round: "Lote",
-      botThinking: "Thinking...",
-      botBid: "¡Ha pujado!",
-      botPassed: "Pasa de largo."
+      back: "Volver", step1: "1. Elige Modo de Juego", mode2p: "2 Jugadores (Local)", modeBot: "1 Jugador vs SubasBot",
+      step2: "2. Elige la Temática", spinning: "GIRANDO RULETA...", spinningDesc: "¡Buscando el siguiente objeto al azar!",
+      currentBid: "Puja Actual", bidderLabel: "Postor", nobody: "Nadie", p1: "Jugador 1", p2: "Jugador 2", bot: "SubasBot 🤖",
+      pass: "Pasar", yourItems: "Tus Objetos", theirItems: "Sus Objetos", playAgain: "Jugar Otra Partida",
+      winP1: "🏆 ¡Gana Jugador 1!", winP2: "🏆 ¡Gana Jugador 2!", winBot: "🤖 ¡Gana el SubasBot!", draw: "🤝 ¡Empate Técnico!"
     },
     en: {
       subtitle: "Compete, bid strategically and create the perfect collection",
-      back: "Back",
-      step1: "1. Choose Game Mode",
-      mode2p: "2 Players (Local)",
-      modeBot: "1 Player vs SubasBot",
-      botDiff: "SubasBot Difficulty:",
-      easy: "Novice",
-      medium: "Tactical",
-      hard: "Master",
-      step2: "2. Choose Theme",
-      spinning: "SPINNING ROULETTE...",
-      spinningDesc: "Searching for the next random item!",
-      currentBid: "Current Bid",
-      bidderLabel: "High Bidder",
-      nobody: "Nobody",
-      p1: "Player 1",
-      p2: "Player 2",
-      bot: "SubasBot 🤖",
-      pass: "Pass",
-      yourItems: "Your Items",
-      theirItems: "Their Items",
-      playAgain: "Play Again",
-      winP1: "🏆 Player 1 Wins!",
-      winP2: "🏆 Player 2 Wins!",
-      winBot: "🤖 SubasBot Wins!",
-      draw: "🤝 It's a Tie!",
-      round: "Lot",
-      botThinking: "Thinking...",
-      botBid: "Bid placed!",
-      botPassed: "Passed."
+      back: "Back", step1: "1. Choose Game Mode", mode2p: "2 Players (Local)", modeBot: "1 Player vs SubasBot",
+      step2: "2. Choose Theme", spinning: "SPINNING ROULETTE...", spinningDesc: "Searching for the next random item!",
+      currentBid: "Current Bid", bidderLabel: "High Bidder", nobody: "Nobody", p1: "Player 1", p2: "Player 2", bot: "SubasBot 🤖",
+      pass: "Pass", yourItems: "Your Items", theirItems: "Their Items", playAgain: "Play Again",
+      winP1: "🏆 Player 1 Wins!", winP2: "🏆 Player 2 Wins!", winBot: "🤖 SubasBot Wins!", draw: "🤝 It's a Tie!"
     },
     zh: {
       subtitle: "策略竞拍，打造属于你的完美收藏",
-      back: "返回",
-      step1: "1. 选择游戏模式",
-      mode2p: "双人本地对战",
-      modeBot: "单人 vs 拍卖机器人",
-      botDiff: "机器人难度:",
-      easy: "新手",
-      medium: "战术",
-      hard: "大师",
-      step2: "2. 选择主题",
-      spinning: "轮盘旋转中...",
-      spinningDesc: "正在随机抽取下一个拍品！",
-      currentBid: "当前出价",
-      bidderLabel: "最高出价者",
-      nobody: "暂无",
-      p1: "玩家 1",
-      p2: "玩家 2",
-      bot: "拍卖机器人 🤖",
-      pass: "放弃",
-      yourItems: "你的物品",
-      theirItems: "对方物品",
-      playAgain: "再玩一局",
-      winP1: "🏆 玩家 1 获胜！",
-      winP2: "🏆 玩家 2 获胜！",
-      winBot: "🤖 机器人获胜！",
-      draw: "🤝 平局！",
-      round: "批次",
-      botThinking: "思考中...",
-      botBid: "已出价！",
-      botPassed: "弃权。"
+      back: "返回", step1: "1. 选择游戏模式", mode2p: "双人本地对战", modeBot: "单人 vs 拍卖机器人",
+      step2: "2. 选择主题", spinning: "轮盘旋转中...", spinningDesc: "正在随机抽取下一个拍品！",
+      currentBid: "当前出价", bidderLabel: "最高出价者", nobody: "暂无", p1: "玩家 1", p2: "玩家 2", bot: "拍卖机器人 🤖",
+      pass: "放弃", yourItems: "你的物品", theirItems: "对方物品", playAgain: "再玩一局",
+      winP1: "🏆 玩家 1 获胜！", winP2: "🏆 玩家 2 获胜！", winBot: "🤖 机器人获胜！", draw: "🤝 平局！"
     },
     ru: {
       subtitle: "Соревнуйтесь, делайте ставки и соберите лучшую коллекцию",
-      back: "Назад",
-      step1: "1. Выберите режим игры",
-      mode2p: "2 Игрока (Локально)",
-      modeBot: "1 Игрок против СубасБота",
-      botDiff: "Сложность бота:",
-      easy: "Новичок",
-      medium: "Тактик",
-      hard: "Мастер",
-      step2: "2. Выберите тему",
-      spinning: "ВРАЩЕНИЕ РУЛЕТКИ...",
-      spinningDesc: "Случайный выбор следующего предмета!",
-      currentBid: "Текущая ставка",
-      bidderLabel: "Покупатель",
-      nobody: "Никто",
-      p1: "Игрок 1",
-      p2: "Игрок 2",
-      bot: "СубасБот 🤖",
-      pass: "Пас",
-      yourItems: "Ваши предметы",
-      theirItems: "Соперник",
-      playAgain: "Сыграть снова",
-      winP1: "🏆 Победил Игрок 1!",
-      winP2: "🏆 Победил Игрок 2!",
-      winBot: "🤖 Победил СубасБот!",
-      draw: "🤝 Ничья!",
-      round: "Лот",
-      botThinking: "Думает...",
-      botBid: "Сделал ставку!",
-      botPassed: "Пас."
+      back: "Назад", step1: "1. Выберите режим игры", mode2p: "2 Игрока (Локально)", modeBot: "1 Игрок против СубасБота",
+      step2: "2. Выберите тему", spinning: "ВРАЩЕНИЕ РУЛЕТКИ...", spinningDesc: "Случайный выбор следующего предмета!",
+      currentBid: "Текущая ставка", bidderLabel: "Покупатель", nobody: "Никто", p1: "Игрок 1", p2: "Игрок 2", bot: "СубасБот 🤖",
+      pass: "Пас", yourItems: "Ваши предметы", theirItems: "Соперник", playAgain: "Сыграть снова",
+      winP1: "🏆 Победил Игрок 1!", winP2: "🏆 Победил Игрок 2!", winBot: "🤖 Победил СубасБот!", draw: "🤝 Ничья!"
     }
   };
 
   const CATEGORIES_DATA = {
     tridente_futbol: {
-      icon: "⚽",
-      title: { es: "Tridente de Fútbol", en: "Football Trio", zh: "足球三叉戟", ru: "Футбольное трио" },
+      icon: "⚽", title: { es: "Tridente de Fútbol", en: "Football Trio", zh: "足球三叉戟", ru: "Футбольное трио" },
       items: [
-        { name: { es: "Lionel Messi", en: "Lionel Messi", zh: "梅西", ru: "Лионель Месси" }, icon: "🐐", desc: { es: "Rey del regate.", en: "Dribbling King.", zh: "过人王。", ru: "Король дриблинга." }, power: 50 },
-        { name: { es: "Cristiano Ronaldo", en: "Cristiano Ronaldo", zh: "C罗", ru: "Криштиану Роналду" }, icon: "⚡", desc: { es: "Máquina del gol.", en: "Goal machine.", zh: "进球机器。", ru: "Машина голов." }, power: 49 },
-        { name: { es: "Kylian Mbappé", en: "Kylian Mbappé", zh: "姆巴佩", ru: "Килиан Мбаппе" }, icon: "🚀", desc: { es: "Velocidad pura.", en: "Pure speed.", zh: "极致速度。", ru: "Чистая скорость." }, power: 48 },
-        { name: { es: "Erling Haaland", en: "Erling Haaland", zh: "哈兰德", ru: "Эрлинг Холанн" }, icon: "🤖", desc: { es: "Potencia y gol.", en: "Power & goal.", zh: "力量与进球。", ru: "Мощь и голы." }, power: 47 }
+        { name: { es: "Delantero Estrella", en: "Star Striker", zh: "明星前锋", ru: "Звездный нападающий" }, icon: "🐐", desc: { es: "Garantiza goles.", en: "Guarantees goals.", zh: "进球保障。", ru: "Гарантия голов." }, power: 50 },
+        { name: { es: "Extremo Veloz", en: "Fast Winger", zh: "飞翼", ru: "Быстрый вингер" }, icon: "⚡", desc: { es: "Desborde puro.", en: "Pure pace.", zh: "极致速度。", ru: "Скорость." }, power: 45 },
+        { name: { es: "Organizador Top", en: "Playmaker", zh: "组织核心", ru: "Плеймейкер" }, icon: "🎯", desc: { es: "Pases perfectos.", en: "Perfect passes.", zh: "精准传球。", ru: "Пасы." }, power: 40 },
+        { name: { es: "Cazagoles", en: "Poacher", zh: "抢点射手", ru: "Форвард" }, icon: "👟", desc: { es: "Siempre remata.", en: "Always finishes.", zh: "门前终结。", ru: "Завершение." }, power: 35 },
+        { name: { es: "Especialista Faltas", en: "Free-kick Spec.", zh: "任意球大师", ru: "Мастер штрафных" }, icon: "📐", desc: { es: "Balón parado.", en: "Dead ball expert.", zh: "定位球强。", ru: "Штрафные." }, power: 30 }
+      ]
+    },
+    defensa_futbol: {
+      icon: "🛡️", title: { es: "Defensa de Fútbol", en: "Football Defence", zh: "防守长城", ru: "Футбольная защита" },
+      items: [
+        { name: { es: "Central Capitán", en: "Captain CB", zh: "队长中卫", ru: "Капитан защитник" }, icon: "🧱", desc: { es: "Líder e imbatible.", en: "Leader & unbeatable.", zh: "防守核心。", ru: "Лидер защиты." }, power: 50 },
+        { name: { es: "Portero Muro", en: "Wall Keeper", zh: "门神", ru: "Вратарь-стена" }, icon: "🧤", desc: { es: "Paradas imposibles.", en: "Impossible saves.", zh: "极限扑救。", ru: "Сэйвы." }, power: 48 },
+        { name: { es: "Lateral Ofensivo", en: "Attacking Back", zh: "进攻型边卫", ru: "Атакующий защитник" }, icon: "🏃", desc: { es: "Sube la banda.", en: "Flank runs.", zh: "插上助攻。", ru: "Рывки." }, power: 42 },
+        { name: { es: "Pivote Cortafuegos", en: "CDM Shield", zh: "铁血后腰", ru: "Опорник" }, icon: "🛑", desc: { es: "Recupera balones.", en: "Ball winner.", zh: "拦截大师。", ru: "Перехваты." }, power: 38 },
+        { name: { es: "Especialista Córners", en: "Header Expert", zh: "争顶专家", ru: "Мастер воздуха" }, icon: "🚀", desc: { es: "Dominio aéreo.", en: "Aerial threat.", zh: "高空制霸。", ru: "Воздух." }, power: 32 }
       ]
     },
     jardin: {
-      icon: "🏡",
-      title: { es: "Casa con Jardín", en: "Garden House", zh: "花园豪宅", ru: "Дом с садом" },
+      icon: "🏡", title: { es: "Casa con Jardín", en: "Garden House", zh: "花园豪宅", ru: "Дом с садом" },
       items: [
         { name: { es: "Piscina Privada", en: "Private Pool", zh: "私人泳池", ru: "Бассейн" }, icon: "🏊‍♂️", desc: { es: "Agua cristalina.", en: "Crystal water.", zh: "清澈泳池。", ru: "Бассейн." }, power: 50 },
-        { name: { es: "Pista de Fútbol 5", en: "Mini Pitch", zh: "五人制足球场", ru: "Мини-поле" }, icon: "⚽", desc: { es: "Césped perfecto.", en: "Perfect turf.", zh: "优质草坪。", ru: "Газон." }, power: 49 },
-        { name: { es: "Barbacoa Gigante", en: "BBQ Grill", zh: "大型烧烤架", ru: "Барбекю" }, icon: "🍖", desc: { es: "Para grandes comidas.", en: "For big parties.", zh: "派对必备。", ru: "Для вечеринок." }, power: 48 }
+        { name: { es: "Pista de Fútbol 5", en: "Mini Pitch", zh: "五人制足球场", ru: "Мини-поле" }, icon: "⚽", desc: { es: "Césped perfecto.", en: "Perfect turf.", zh: "优质草坪。", ru: "Газон." }, power: 48 },
+        { name: { es: "Barbacoa Gigante", en: "BBQ Grill", zh: "大型烧烤架", ru: "Барбекю" }, icon: "🍖", desc: { es: "Para grandes comidas.", en: "For big parties.", zh: "派对必备。", ru: "Для вечеринок." }, power: 40 },
+        { name: { es: "Jacuzzi Exterior", en: "Outdoor Jacuzzi", zh: "露天按摩池", ru: "Джакузи" }, icon: "🛁", desc: { es: "Relax total.", en: "Total relax.", zh: "放松身心。", ru: "Релакс." }, power: 38 },
+        { name: { es: "Porche Chillout", en: "Chillout Porch", zh: "休 an 露台", ru: "Веранда" }, icon: "🛋️", desc: { es: "Sillones cómodos.", en: "Comfy sofas.", zh: "舒适沙发。", ru: "Уют." }, power: 30 }
       ]
     },
     setup_gaming: {
-      icon: "🎮",
-      title: { es: "Habitación Gamer", en: "Gaming Room", zh: "电竞小屋", ru: "Геймерская" },
+      icon: "🎮", title: { es: "Habitación Gamer", en: "Gaming Room", zh: "电竞小屋", ru: "Геймерская" },
       items: [
         { name: { es: "PC RTX 4090", en: "PC RTX 4090", zh: "顶级电脑", ru: "ПК RTX 4090" }, icon: "🖥️", desc: { es: "Máxima potencia.", en: "Max power.", zh: "性能怪兽。", ru: "Макс. мощность." }, power: 50 },
-        { name: { es: "Monitor OLED 240Hz", en: "240Hz Monitor", zh: "240Hz显示器", ru: "Монитор 240Гц" }, icon: "📺", desc: { es: "Fluidez total.", en: "Ultra smooth.", zh: "极致丝滑。", ru: "Плавность." }, power: 49 }
+        { name: { es: "Monitor OLED 240Hz", en: "240Hz Monitor", zh: "240Hz显示器", ru: "Монитор 240Гц" }, icon: "📺", desc: { es: "Fluidez total.", en: "Ultra smooth.", zh: "极致丝滑。", ru: "Плавность." }, power: 46 },
+        { name: { es: "Silla Ergonómica", en: "Ergonomic Chair", zh: "人体工学椅", ru: "Кресло" }, icon: "🪑", desc: { es: "Comodidad 24/7.", en: "Comfort 24/7.", zh: "久坐不累。", ru: "Комфорт." }, power: 38 },
+        { name: { es: "Consola de Última Gen", en: "Next-Gen Console", zh: "次世代主机", ru: "Консоль" }, icon: "🎮", desc: { es: "Exclusivos top.", en: "Top exclusives.", zh: "独占大作。", ru: "Игры." }, power: 36 },
+        { name: { es: "Luces RGB Neón", en: "RGB Lights", zh: "RGB氛围灯", ru: "RGB Подсветка" }, icon: "💡", desc: { es: "Estética 10/10.", en: "Aesthetic 10/10.", zh: "氛围感拉满。", ru: "Стиль." }, power: 25 }
+      ]
+    },
+    isla_lujo: {
+      icon: "🏝️", title: { es: "Isla Privada de Lujo", en: "Luxury Island", zh: "奢华私人岛", ru: "Частный остров" },
+      items: [
+        { name: { es: "Helipuerto Privado", en: "Private Helipad", zh: "私人直升机坪", ru: "Вертолетная площадка" }, icon: "🚁", desc: { es: "Llegada directa.", en: "Direct access.", zh: "直达通道。", ru: "Быстрый доступ." }, power: 50 },
+        { name: { es: "Villa sobre el Mar", en: "Overwater Villa", zh: "水上水疗别墅", ru: "Вилла на воде" }, icon: "🏰", desc: { es: "Vistas infinitas.", en: "Endless views.", zh: "无敌海景。", ru: "Вид на океан." }, power: 48 },
+        { name: { es: "Yate de Recreo", en: "Pleasure Yacht", zh: "游艇", ru: "Яхта" }, icon: "🛥️", desc: { es: "Navega con estilo.", en: "Sail in style.", zh: "出海出游。", ru: "Морская прогулка." }, power: 42 },
+        { name: { es: "Muelle Privado", en: "Private Dock", zh: "私人码头", ru: "Причал" }, icon: "⚓", desc: { es: "Para embarcaciones.", en: "For boats.", zh: "停泊码头。", ru: "Для катеров." }, power: 32 },
+        { name: { es: "Cabaña en la Playa", en: "Beach Cabana", zh: "沙滩小屋", ru: "Пляжный домик" }, icon: "🏖️", desc: { es: "Sombra y relax.", en: "Shade & relax.", zh: "遮阳休息。", ru: "Тень." }, power: 28 }
+      ]
+    },
+    supergaraje: {
+      icon: "🏎️", title: { es: "Supergaraje", en: "Super Garage", zh: "超级车库", ru: "Супергараж" },
+      items: [
+        { name: { es: "Superdeportivo", en: "Supercar", zh: "超跑", ru: "Суперкар" }, icon: "🏎️", desc: { es: "0 a 100 en 2.5s.", en: "0 to 100 in 2.5s.", zh: "零百加速2.5秒。", ru: "0-100 за 2.5с." }, power: 50 },
+        { name: { es: "4x4 Extremo", en: "Extreme 4x4", zh: "越野车", ru: "Внедорожник" }, icon: "🛻", desc: { es: "Sube cualquier terreno.", en: "Conquers all.", zh: "征服全地形。", ru: "Вседорожный." }, power: 44 },
+        { name: { es: "Moto Deportiva", en: "Sports Bike", zh: "重机车", ru: "Спортбайк" }, icon: "🏍️", desc: { es: "Adrenalina pura.", en: "Pure adrenaline.", zh: "速度与激情。", ru: "Адреналин." }, power: 38 },
+        { name: { es: "Coche Clásico", en: "Classic Car", zh: "复古老爷车", ru: "Классическое авто" }, icon: "🚗", desc: { es: "Elegancia vintage.", en: "Vintage elegance.", zh: "复古典雅。", ru: "Элегантность." }, power: 34 },
+        { name: { es: "Kart de Competición", en: "Go-Kart", zh: "卡丁车", ru: "Карт" }, icon: "🏎", desc: { es: "Diversión en pista.", en: "Track fun.", zh: "赛道乐趣。", ru: "Драйв." }, power: 26 }
+      ]
+    },
+    retro_collection: {
+      icon: "🕹️", title: { es: "Colección Retro", en: "Retro Collection", zh: "怀旧收藏", ru: "Ретро коллекция" },
+      items: [
+        { name: { es: "Recreativa Arcade", en: "Arcade Cabinet", zh: "街机游戏机", ru: "Аркадный автомат" }, icon: "👾", desc: { es: "Clásico de bar.", en: "Bar classic.", zh: "街机回忆。", ru: "Классика." }, power: 50 },
+        { name: { es: "Colección Cartuchos", en: "Cartridges", zh: "卡带收藏", ru: "Коллекция картриджей" }, icon: "💾", desc: { es: "Joyas intactas.", en: "Untouched gems.", zh: "珍贵游戏。", ru: "Редкие игры." }, power: 45 },
+        { name: { es: "TV de Tubo CRT", en: "CRT TV", zh: "CRT大头电视", ru: "ЭЛТ Телевизор" }, icon: "📺", desc: { es: "Cero input lag.", en: "Zero input lag.", zh: "无延迟体验。", ru: "Без задержки." }, power: 36 },
+        { name: { es: "Game Boy Original", en: "Original GameBoy", zh: "初代GameBoy", ru: "Оригинальный GameBoy" }, icon: "📟", desc: { es: "Pantalla verde.", en: "Green screen.", zh: "经典绿屏。", ru: "Легенда." }, power: 35 },
+        { name: { es: "Revistas 90s", en: "90s Magazines", zh: "90年代游戏杂志", ru: "Журналы 90-х" }, icon: "📚", desc: { es: "Guías y trucos.", en: "Guides & cheats.", zh: "攻略秘籍。", ru: "Гайды." }, power: 24 }
+      ]
+    },
+    setup_streaming: {
+      icon: "🎙️", title: { es: "Setup Streaming", en: "Streaming Setup", zh: "直播装备", ru: "Стриминг сетап" },
+      items: [
+        { name: { es: "Cámara DSLR 4K", en: "4K DSLR Camera", zh: "4K专业相机", ru: "Камера 4K" }, icon: "📷", desc: { es: "Imagen de cine.", en: "Cinema quality.", zh: "电影级画质。", ru: "Кинокачество." }, power: 50 },
+        { name: { es: "Micrófono Estudio", en: "Studio Mic", zh: "录音室麦克风", ru: "Студийный микрофон" }, icon: "🎙️", desc: { es: "Voz limpia.", en: "Crystal sound.", zh: "高清音质。", ru: "Чистый звук." }, power: 46 },
+        { name: { es: "Focus de Luz LED", en: "LED Key Light", zh: "LED补光灯", ru: "Светодиодный софтбокс" }, icon: "☀️", desc: { es: "Iluminación 100%.", en: "Pro lighting.", zh: "专业照明。", ru: "Про-свет." }, power: 38 },
+        { name: { es: "Stream Deck", en: "Stream Deck", zh: "快捷控制板", ru: "Контроллер Stream Deck" }, icon: "🎛️", desc: { es: "Atajos rápidos.", en: "Quick macros.", zh: "一键切换。", ru: "Макросы." }, power: 34 },
+        { name: { es: "Fondo Croma Verde", en: "Green Screen", zh: "绿幕", ru: "Хромакей" }, icon: "🟩", desc: { es: "Efectos visuales.", en: "Visual FX.", zh: "抠图必备。", ru: "Эффекты." }, power: 22 }
+      ]
+    },
+    guardarropa: {
+      icon: "👗", title: { es: "Guardarropa Lujo", en: "Luxury Closet", zh: "高级衣橱", ru: "Роскошный гардероб" },
+      items: [
+        { name: { es: "Reloj Suizo Gold", en: "Gold Swiss Watch", zh: "瑞士金表", ru: "Золотые часы" }, icon: "⌚", desc: { es: "Alta joyería.", en: "High jewelry.", zh: "奢华腕表。", ru: "Роскошь." }, power: 50 },
+        { name: { es: "Traje a Medida", en: "Tailored Suit", zh: "定制西装", ru: "Костюм на заказ" }, icon: "👔", desc: { es: "Corte perfecto.", en: "Perfect fit.", zh: "合体剪裁。", ru: "Идеальный крой." }, power: 45 },
+        { name: { es: "Zapatillas Edición", en: "Limited Sneakers", zh: "限量球鞋", ru: "Лимитированные кроссовки" }, icon: "👟", desc: { es: "Pieza coleccionable.", en: "Collector's item.", zh: "收藏稀有款。", ru: "Эксклюзив." }, power: 38 },
+        { name: { es: "Gafas de Sol Italia", en: "Italian Sunglasses", zh: "意大利墨镜", ru: "Итальянские очки" }, icon: "🕶️", desc: { es: "Estilo puro.", en: "Pure style.", zh: "时尚范儿。", ru: "Стиль." }, power: 32 },
+        { name: { es: "Bolso Exclusivo", en: "Designer Bag", zh: "设计师包包", ru: "Дизайнерская сумка" }, icon: "👜", desc: { es: "Piel auténtica.", en: "Real leather.", zh: "真皮限量。", ru: "Кожа." }, power: 30 }
+      ]
+    },
+    intergalactico: {
+      icon: "🚀", title: { es: "Viaje Intergaláctico", en: "Space Travel", zh: "星际旅行", ru: "Космическое путешествие" },
+      items: [
+        { name: { es: "Nave Espacial", en: "Spaceship", zh: "星际飞船", ru: "Космический корабль" }, icon: "🚀", desc: { es: "Motor de curvatura.", en: "Warp drive.", zh: "曲率引擎。", ru: "Варп-двигатель." }, power: 50 },
+        { name: { es: "Traje de Astronauta", en: "Spacesuit", zh: "宇航服", ru: "Скафандр" }, icon: "🧑‍🚀", desc: { es: "Soporte vital.", en: "Life support.", zh: "生命保障。", ru: "Жизнеобеспечение." }, power: 46 },
+        { name: { es: "Rover Marciano", en: "Mars Rover", zh: "火星探测车", ru: "Марсоход" }, icon: "🚜", desc: { es: "Exploración 4x4.", en: "4x4 Exploration.", zh: "火星表面履勘。", ru: "Исследования." }, power: 40 },
+        { name: { es: "Telescopio Láser", en: "Laser Telescope", zh: "激光望远镜", ru: "Лазерный телескоп" }, icon: "🔭", desc: { es: "Observa galaxias.", en: "Galaxy viewer.", zh: "深空观测。", ru: "Галактики." }, power: 34 },
+        { name: { es: "Meteorito Raro", en: "Rare Meteorite", zh: "稀有陨石", ru: "Редкий метеорит" }, icon: "☄️", desc: { es: "Mineral extraterrestre.", en: "Alien mineral.", zh: "外星矿物。", ru: "Минерал." }, power: 28 }
       ]
     }
   };
 
   let gameMode = '2p';
-  let botDiff = 'easy';
   let selectedCategoryKey = 'tridente_futbol';
   let availablePool = [];
   
@@ -402,9 +348,7 @@
   let activeItem = null;
   let isSpinning = false;
 
-  window.onload = () => {
-    changeLanguage('es');
-  };
+  window.onload = () => { changeLanguage('es'); };
 
   function changeLanguage(lang) {
     currentLang = lang;
@@ -417,10 +361,6 @@
     document.getElementById('txt-step1').innerText = t.step1;
     document.getElementById('txt-mode-2p').innerText = t.mode2p;
     document.getElementById('txt-mode-bot').innerText = t.modeBot;
-    document.getElementById('txt-bot-diff').innerText = t.botDiff;
-    document.getElementById('txt-easy').innerText = t.easy;
-    document.getElementById('txt-medium').innerText = t.medium;
-    document.getElementById('txt-hard').innerText = t.hard;
     document.getElementById('txt-step2').innerText = t.step2;
     document.getElementById('txt-current-bid').innerText = t.currentBid;
     document.getElementById('txt-bidder-label').innerText = t.bidderLabel;
@@ -442,15 +382,7 @@
     gameMode = mode;
     document.getElementById('btn-mode-2p').classList.toggle('selected', mode === '2p');
     document.getElementById('btn-mode-bot').classList.toggle('selected', mode === 'bot');
-    document.getElementById('bot-difficulty-section').style.display = mode === 'bot' ? 'block' : 'none';
     changeLanguage(currentLang);
-  }
-
-  function selectDiff(diff) {
-    botDiff = diff;
-    document.getElementById('diff-easy').classList.toggle('selected', diff === 'easy');
-    document.getElementById('diff-medium').classList.toggle('selected', diff === 'medium');
-    document.getElementById('diff-hard').classList.toggle('selected', diff === 'hard');
   }
 
   function renderCategorySelection() {
@@ -461,10 +393,7 @@
       const cat = CATEGORIES_DATA[key];
       const card = document.createElement('div');
       card.className = 'cat-card';
-      card.innerHTML = `
-        <div class="cat-icon">${cat.icon}</div>
-        <strong>${cat.title[currentLang]}</strong>
-      `;
+      card.innerHTML = `<div class="cat-icon">${cat.icon}</div><strong>${cat.title[currentLang]}</strong>`;
       card.onclick = () => startGame(key);
       grid.appendChild(card);
     }
@@ -537,7 +466,7 @@
 
         if (gameMode === 'bot') setTimeout(botDecision, 800);
       }
-    }, 100);
+    }, 80);
   }
 
   function playerBid(player, increment) {
@@ -561,7 +490,7 @@
     }
   }
 
-  function awardItem(winner, cost = currentBid) {
+  function awardItem(winner, cost) {
     if (winner === 1) {
       p1.money -= cost;
       p1.inventory.push(activeItem);
@@ -574,15 +503,12 @@
 
   function botDecision() {
     if (isSpinning || highestBidder === 2) return;
-    document.getElementById('p2-bot-status').innerText = I18N[currentLang].botThinking;
 
-    if (currentBid + 1 <= p2.money && activeItem.power > 40) {
+    if (currentBid + 1 <= p2.money && activeItem.power > 35) {
       currentBid += 1;
       highestBidder = 2;
-      document.getElementById('p2-bot-status').innerText = I18N[currentLang].botBid;
       updateUI();
     } else {
-      document.getElementById('p2-bot-status').innerText = I18N[currentLang].botPassed;
       setTimeout(() => playerPass(2), 500);
     }
   }
@@ -613,8 +539,10 @@
     document.getElementById('auction-screen').style.display = 'none';
     document.getElementById('results-screen').style.display = 'block';
 
-    const p1Score = p1.inventory.reduce((acc, i) => acc + i.power, 0) + p1.money;
-    const p2Score = p2.inventory.reduce((acc, i) => acc + i.power, 0) + p2.money;
+    const p1Val = p1.inventory.reduce((acc, i) => acc + i.power, 0);
+    const p2Val = p2.inventory.reduce((acc, i) => acc + i.power, 0);
+    const p1Score = p1Val + p1.money;
+    const p2Score = p2Val + p2.money;
     const t = I18N[currentLang];
 
     if (p1Score > p2Score) {
@@ -624,6 +552,12 @@
     } else {
       document.getElementById('winner-title').innerText = t.draw;
     }
+
+    document.getElementById('winner-explanation').innerHTML = `
+      <strong>Resumen de la Partida:</strong><br>
+      • ${t.p1}: ${p1Val} pts en objetos + ${p1.money} € restantes = <strong>${p1Score} pts</strong><br>
+      • ${gameMode === 'bot' ? t.bot : t.p2}: ${p2Val} pts en objetos + ${p2.money} € restantes = <strong>${p2Score} pts</strong>
+    `;
 
     renderInv('res-p1-inv', p1.inventory);
     renderInv('res-p2-inv', p2.inventory);
