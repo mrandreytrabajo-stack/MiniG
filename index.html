@@ -19,15 +19,18 @@
     body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; }
     .container { max-width: 1000px; margin: 0 auto; }
     
-    header { text-align: center; margin-bottom: 25px; position: relative; }
-    h1 { font-size: 2.5rem; color: #f59e0b; margin-bottom: 5px; }
-    p.subtitle { color: var(--text-muted); font-size: 1.1rem; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+    .header-title-box { text-align: left; }
+    h1 { font-size: 2.2rem; color: #f59e0b; margin-bottom: 5px; }
+    p.subtitle { color: var(--text-muted); font-size: 1rem; }
+
+    /* Controles de Idioma */
+    .lang-selector { display: flex; gap: 8px; background: #1e293b; padding: 6px 12px; border-radius: 10px; border: 1px solid #334155; }
+    .lang-btn { background: #334155; color: var(--text); border: 1px solid #475569; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
+    .lang-btn:hover { background: #475569; }
+    .lang-btn.active { background: #f59e0b; color: #0f172a; border-color: #f59e0b; }
 
     .btn-back {
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
       background: #334155;
       color: var(--text);
       border: 1px solid #475569;
@@ -36,7 +39,7 @@
       font-weight: bold;
       cursor: pointer;
       transition: all 0.2s;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
     }
@@ -93,8 +96,7 @@
     @keyframes pulse { from { opacity: 0.4; transform: scale(0.98); } to { opacity: 1; transform: scale(1.02); } }
 
     @media (max-width: 600px) {
-      header { text-align: right; }
-      .btn-back { position: static; transform: none; margin-bottom: 10px; width: fit-content; }
+      header { flex-direction: column; align-items: flex-start; }
       .players-container { grid-template-columns: 1fr; }
     }
   </style>
@@ -103,34 +105,46 @@
 
 <div class="container">
   <header>
-    <button id="nav-back-btn" class="btn-back" onclick="goToMenu()" style="display: none;">⬅ Volver al Menú</button>
-    <h1>🔨 SubastIA</h1>
-    <p class="subtitle">Compite, puja estratégicamente y crea la colección perfecta</p>
+    <div>
+      <button id="nav-back-btn" class="btn-back" onclick="goToMenu()" style="display: none;">⬅ <span id="txt-back">Volver</span></button>
+      <div class="header-title-box">
+        <h1>🔨 SubastIA</h1>
+        <p class="subtitle" id="txt-subtitle">Compite, puja estratégicamente y crea la colección perfecta</p>
+      </div>
+    </div>
+
+    <!-- SELECTOR DE IDIOMA -->
+    <div class="lang-selector">
+      <button class="lang-btn active" id="lang-es" onclick="changeLanguage('es')">🇪🇸 ES</button>
+      <button class="lang-btn" id="lang-en" onclick="changeLanguage('en')">🇬🇧 EN</button>
+      <button class="lang-btn" id="lang-zh" onclick="changeLanguage('zh')">🇨🇳 ZH</button>
+      <button class="lang-btn" id="lang-ru" onclick="changeLanguage('ru')">🇷🇺 RU</button>
+    </div>
   </header>
 
   <!-- MENÚ PRINCIPAL -->
   <div id="menu-screen">
     <div class="section-card">
-      <h2>1. Elige Modo de Juego</h2>
+      <h2 id="txt-step1">1. Elige Modo de Juego</h2>
       <br>
       <div class="grid-2">
-        <button class="btn btn-p1 selected" id="btn-mode-2p" onclick="selectMode('2p')">👥 2 Jugadores (Local)</button>
-        <button class="btn btn-p2" id="btn-mode-bot" onclick="selectMode('bot')">🤖 1 Jugador vs SubasBot</button>
+        <button class="btn btn-p1 selected" id="btn-mode-2p" onclick="selectMode('2p')">👥 <span id="txt-mode-2p">2 Jugadores (Local)</span></button>
+        <button class="btn btn-p2" id="btn-mode-bot" onclick="selectMode('bot')">🤖 <span id="txt-mode-bot">1 Jugador vs SubasBot</span></button>
       </div>
       
       <div id="bot-difficulty-section" style="display:none; margin-top: 20px;">
-        <h3>Dificultad del SubasBot:</h3>
+        <h3 id="txt-bot-diff">Dificultad del SubasBot:</h3>
         <br>
         <div class="grid-3">
-          <button class="btn selected" id="diff-easy" onclick="selectDiff('easy')">🟢 Novato</button>
-          <button class="btn" id="diff-medium" onclick="selectDiff('medium')">🟡 Táctico</button>
-          <button class="btn" id="diff-hard" onclick="selectDiff('hard')">🔴 Maestro</button>
+          <button class="btn selected" id="diff-easy" onclick="selectDiff('easy')">🟢 <span id="txt-easy">Novato</span></button>
+          <button class="btn" id="diff-medium" onclick="selectDiff('medium')">🟡 <span id="txt-medium">Táctico</span></button>
+          <button class="btn" id="diff-hard" onclick="selectDiff('hard')">🔴 <span id="txt-hard">Maestro</span></button>
         </div>
       </div>
     </div>
 
     <div class="section-card">
-      <h2>2. Elige la Temática</h2>
+      <h2 id="txt-step2">2. Elige la Temática</h2>
       <br>
       <div class="grid-3" id="categories-grid"></div>
     </div>
@@ -150,22 +164,22 @@
     </div>
 
     <div class="bid-status">
-      Puja Actual: <span id="current-bid-amount" style="color: #10b981; font-weight: bold;">0 €</span> 
-      | Postor: <span id="current-bidder-name" class="highest-bidder">Nadie</span>
+      <span id="txt-current-bid">Puja Actual</span>: <span id="current-bid-amount" style="color: #10b981; font-weight: bold;">0 €</span> 
+      | <span id="txt-bidder-label">Postor</span>: <span id="current-bidder-name" class="highest-bidder">Nadie</span>
     </div>
 
     <div class="players-container">
       <!-- JUGADOR 1 -->
       <div class="player-box p1" id="p1-box">
-        <h3>Jugador 1</h3>
+        <h3 id="p1-title">Jugador 1</h3>
         <div class="wallet">💰 <span id="p1-money">20</span> €</div>
         <div class="controls">
           <button class="btn btn-p1" id="p1-btn-1" onclick="playerBid(1, 1)">+1 €</button>
           <button class="btn btn-p1" id="p1-btn-2" onclick="playerBid(1, 2)">+2 €</button>
-          <button class="btn btn-pass" id="p1-btn-pass" onclick="playerPass(1)">Ceder / Pasar</button>
+          <button class="btn btn-pass" id="p1-btn-pass" onclick="playerPass(1)"><span id="txt-pass-p1">Pasar</span></button>
         </div>
         <div class="inventory">
-          <div class="inventory-title">Tus Objetos (<span id="p1-count">0</span>/4):</div>
+          <div class="inventory-title"><span id="txt-inv-p1">Tus Objetos</span> (<span id="p1-count">0</span>/4):</div>
           <div class="inventory-list" id="p1-inventory"></div>
         </div>
       </div>
@@ -178,10 +192,10 @@
         <div class="controls" id="p2-controls">
           <button class="btn btn-p2" id="p2-btn-1" onclick="playerBid(2, 1)">+1 €</button>
           <button class="btn btn-p2" id="p2-btn-2" onclick="playerBid(2, 2)">+2 €</button>
-          <button class="btn btn-pass" id="p2-btn-pass" onclick="playerPass(2)">Ceder / Pasar</button>
+          <button class="btn btn-pass" id="p2-btn-pass" onclick="playerPass(2)"><span id="txt-pass-p2">Pasar</span></button>
         </div>
         <div class="inventory">
-          <div class="inventory-title">Sus Objetos (<span id="p2-count">0</span>/4):</div>
+          <div class="inventory-title"><span id="txt-inv-p2">Sus Objetos</span> (<span id="p2-count">0</span>/4):</div>
           <div class="inventory-list" id="p2-inventory"></div>
         </div>
       </div>
@@ -196,7 +210,7 @@
       
       <div class="grid-2">
         <div class="player-box p1">
-          <h3>Jugador 1</h3>
+          <h3 id="res-p1-title">Jugador 1</h3>
           <div class="inventory-list" id="res-p1-inv" style="margin-top:10px;"></div>
         </div>
         <div class="player-box p2">
@@ -205,327 +219,421 @@
         </div>
       </div>
       <br>
-      <button class="btn" onclick="goToMenu()" style="font-size: 1.2rem; padding: 15px 30px;">🔄 Jugar Otra Partida</button>
+      <button class="btn" onclick="goToMenu()" style="font-size: 1.2rem; padding: 15px 30px;">🔄 <span id="txt-play-again">Jugar Otra Partida</span></button>
     </div>
   </div>
 
 </div>
 
 <script>
+  let currentLang = 'es';
+
+  const I18N = {
+    es: {
+      subtitle: "Compite, puja estratégicamente y crea la colección perfecta",
+      back: "Volver",
+      step1: "1. Elige Modo de Juego",
+      mode2p: "2 Jugadores (Local)",
+      modeBot: "1 Jugador vs SubasBot",
+      botDiff: "Dificultad del SubasBot:",
+      easy: "Novato",
+      medium: "Táctico",
+      hard: "Maestro",
+      step2: "2. Elige la Temática",
+      spinning: "GIRANDO RULETA...",
+      spinningDesc: "¡Buscando el siguiente objeto al azar!",
+      currentBid: "Puja Actual",
+      bidderLabel: "Postor",
+      nobody: "Nadie",
+      p1: "Jugador 1",
+      p2: "Jugador 2",
+      bot: "SubasBot 🤖",
+      pass: "Pasar",
+      yourItems: "Tus Objetos",
+      theirItems: "Sus Objetos",
+      playAgain: "Jugar Otra Partida",
+      winP1: "🏆 ¡Gana Jugador 1!",
+      winP2: "🏆 ¡Gana Jugador 2!",
+      winBot: "🤖 ¡Gana el SubasBot!",
+      draw: "🤝 ¡Empate Técnico!",
+      round: "Lote",
+      botThinking: "Thinking...",
+      botBid: "¡Ha pujado!",
+      botPassed: "Pasa de largo."
+    },
+    en: {
+      subtitle: "Compete, bid strategically and create the perfect collection",
+      back: "Back",
+      step1: "1. Choose Game Mode",
+      mode2p: "2 Players (Local)",
+      modeBot: "1 Player vs SubasBot",
+      botDiff: "SubasBot Difficulty:",
+      easy: "Novice",
+      medium: "Tactical",
+      hard: "Master",
+      step2: "2. Choose Theme",
+      spinning: "SPINNING ROULETTE...",
+      spinningDesc: "Searching for the next random item!",
+      currentBid: "Current Bid",
+      bidderLabel: "High Bidder",
+      nobody: "Nobody",
+      p1: "Player 1",
+      p2: "Player 2",
+      bot: "SubasBot 🤖",
+      pass: "Pass",
+      yourItems: "Your Items",
+      theirItems: "Their Items",
+      playAgain: "Play Again",
+      winP1: "🏆 Player 1 Wins!",
+      winP2: "🏆 Player 2 Wins!",
+      winBot: "🤖 SubasBot Wins!",
+      draw: "🤝 It's a Tie!",
+      round: "Lot",
+      botThinking: "Thinking...",
+      botBid: "Bid placed!",
+      botPassed: "Passed."
+    },
+    zh: {
+      subtitle: "策略竞拍，打造属于你的完美收藏",
+      back: "返回",
+      step1: "1. 选择游戏模式",
+      mode2p: "双人本地对战",
+      modeBot: "单人 vs 拍卖机器人",
+      botDiff: "机器人难度:",
+      easy: "新手",
+      medium: "战术",
+      hard: "大师",
+      step2: "2. 选择主题",
+      spinning: "轮盘旋转中...",
+      spinningDesc: "正在随机抽取下一个拍品！",
+      currentBid: "当前出价",
+      bidderLabel: "最高出价者",
+      nobody: "暂无",
+      p1: "玩家 1",
+      p2: "玩家 2",
+      bot: "拍卖机器人 🤖",
+      pass: "放弃",
+      yourItems: "你的物品",
+      theirItems: "对方物品",
+      playAgain: "再玩一局",
+      winP1: "🏆 玩家 1 获胜！",
+      winP2: "🏆 玩家 2 获胜！",
+      winBot: "🤖 机器人获胜！",
+      draw: "🤝 平局！",
+      round: "批次",
+      botThinking: "思考中...",
+      botBid: "已出价！",
+      botPassed: "弃权。"
+    },
+    ru: {
+      subtitle: "Соревнуйтесь, делайте ставки и соберите лучшую коллекцию",
+      back: "Назад",
+      step1: "1. Выберите режим игры",
+      mode2p: "2 Игрока (Локально)",
+      modeBot: "1 Игрок против СубасБота",
+      botDiff: "Сложность бота:",
+      easy: "Новичок",
+      medium: "Тактик",
+      hard: "Мастер",
+      step2: "2. Выберите тему",
+      spinning: "ВРАЩЕНИЕ РУЛЕТКИ...",
+      spinningDesc: "Случайный выбор следующего предмета!",
+      currentBid: "Текущая ставка",
+      bidderLabel: "Покупатель",
+      nobody: "Никто",
+      p1: "Игрок 1",
+      p2: "Игрок 2",
+      bot: "СубасБот 🤖",
+      pass: "Пас",
+      yourItems: "Ваши предметы",
+      theirItems: "Соперник",
+      playAgain: "Сыграть снова",
+      winP1: "🏆 Победил Игрок 1!",
+      winP2: "🏆 Победил Игрок 2!",
+      winBot: "🤖 Победил СубасБот!",
+      draw: "🤝 Ничья!",
+      round: "Лот",
+      botThinking: "Думает...",
+      botBid: "Сделал ставку!",
+      botPassed: "Пас."
+    }
+  };
+
   const CATEGORIES_DATA = {
     tridente_futbol: {
-      title: "Tridente de Fútbol",
       icon: "⚽",
+      title: { es: "Tridente de Fútbol", en: "Football Trio", zh: "足球三叉戟", ru: "Футбольное трио" },
       items: [
-        { name: "Lionel Messi", icon: "🐐", desc: "El rey del regate y de los pases imposibles.", power: 50 },
-        { name: "Cristiano Ronaldo", icon: "⚡", desc: "Máquina del gol y rematador definitivo.", power: 49 },
-        { name: "Kylian Mbappé", icon: "🚀", desc: "Velocidad pura para dejar atrás a la defensa.", power: 48 },
-        { name: "Vinícius Júnior", icon: "🔥", desc: "Regateador alegre e imparable en la banda.", power: 47 },
-        { name: "Erling Haaland", icon: "🤖", desc: "Potencia física y gol asegurado.", power: 46 },
-        { name: "Lamine Yamal", icon: "⭐", desc: "Joven joya del regate con zurda de oro.", power: 45 },
-        { name: "Neymar Jr", icon: "🪄", desc: "Magia, fantasía y caños espectaculares.", power: 44 },
-        { name: "Robert Lewandowski", icon: "🎯", desc: "El goleador con definición perfecta.", power: 43 },
-        { name: "Mohamed Salah", icon: "🏹", desc: "La flecha egipcia con gol constante.", power: 42 },
-        { name: "Jude Bellingham", icon: "👑", desc: "Llegador desde atrás con presencia total.", power: 41 }
-      ]
-    },
-    defensa_futbol: {
-      title: "Defensa de Fútbol",
-      icon: "🛡️",
-      items: [
-        { name: "Paolo Maldini", icon: "🧱", desc: "Elegancia, corte perfecto y leyenda.", power: 50 },
-        { name: "Sergio Ramos", icon: "🔥", desc: "Central guerrero y especialista en goles de cabeza.", power: 49 },
-        { name: "Virgil van Dijk", icon: "🔒", desc: "Muro infranqueable por aire y tierra.", power: 48 },
-        { name: "Roberto Carlos", icon: "🚀", desc: "Lateral izquierdo con disparo de cañón.", power: 47 },
-        { name: "Dani Alves", icon: "⚡", desc: "El lateral con más títulos de la historia.", power: 46 },
-        { name: "Carles Puyol", icon: "🦁", desc: "Corazón, entrega y liderazgo indestructible.", power: 45 },
-        { name: "Thibaut Courtois", icon: "🧤", desc: "Portero gigante que lo para todo.", power: 44 }
+        { name: { es: "Lionel Messi", en: "Lionel Messi", zh: "梅西", ru: "Лионель Месси" }, icon: "🐐", desc: { es: "Rey del regate.", en: "Dribbling King.", zh: "过人王。", ru: "Король дриблинга." }, power: 50 },
+        { name: { es: "Cristiano Ronaldo", en: "Cristiano Ronaldo", zh: "C罗", ru: "Криштиану Роналду" }, icon: "⚡", desc: { es: "Máquina del gol.", en: "Goal machine.", zh: "进球机器。", ru: "Машина голов." }, power: 49 },
+        { name: { es: "Kylian Mbappé", en: "Kylian Mbappé", zh: "姆巴佩", ru: "Килиан Мбаппе" }, icon: "🚀", desc: { es: "Velocidad pura.", en: "Pure speed.", zh: "极致速度。", ru: "Чистая скорость." }, power: 48 },
+        { name: { es: "Erling Haaland", en: "Erling Haaland", zh: "哈兰德", ru: "Эрлинг Холанн" }, icon: "🤖", desc: { es: "Potencia y gol.", en: "Power & goal.", zh: "力量与进球。", ru: "Мощь и голы." }, power: 47 }
       ]
     },
     jardin: {
-      title: "La Casa con Jardín",
       icon: "🏡",
+      title: { es: "Casa con Jardín", en: "Garden House", zh: "花园豪宅", ru: "Дом с садом" },
       items: [
-        { name: "Piscina Olímpica Privada", icon: "🏊‍♂️", desc: "Para refrescarse en verano con amigos.", power: 50 },
-        { name: "Pista de Fútbol 5", icon: "⚽", desc: "Campo de césped con porterías e iluminación.", power: 49 },
-        { name: "Jacuzzi con Hidromasaje", icon: "🫧", desc: "Burbujas relajantes al aire libre.", power: 48 },
-        { name: "Barbacoa Gigante de Acero", icon: "🍖", desc: "Para organizar las mejores hamburguesadas.", power: 47 },
-        { name: "Cama Elástica Gigante", icon: "🤸‍♂️", desc: "Saltos y piruetas para todas las edades.", power: 46 },
-        { name: "Proyector de Cine para Jardín", icon: "🎬", desc: "Noches de películas y partidos al aire libre.", power: 45 }
+        { name: { es: "Piscina Privada", en: "Private Pool", zh: "私人泳池", ru: "Бассейн" }, icon: "🏊‍♂️", desc: { es: "Agua cristalina.", en: "Crystal water.", zh: "清澈泳池。", ru: "Бассейн." }, power: 50 },
+        { name: { es: "Pista de Fútbol 5", en: "Mini Pitch", zh: "五人制足球场", ru: "Мини-поле" }, icon: "⚽", desc: { es: "Césped perfecto.", en: "Perfect turf.", zh: "优质草坪。", ru: "Газон." }, power: 49 },
+        { name: { es: "Barbacoa Gigante", en: "BBQ Grill", zh: "大型烧烤架", ru: "Барбекю" }, icon: "🍖", desc: { es: "Para grandes comidas.", en: "For big parties.", zh: "派对必备。", ru: "Для вечеринок." }, power: 48 }
       ]
     },
     setup_gaming: {
-      title: "Habitación Gamer",
       icon: "🎮",
+      title: { es: "Habitación Gamer", en: "Gaming Room", zh: "电竞小屋", ru: "Геймерская" },
       items: [
-        { name: "PC Superpotente RTX 4090", icon: "🖥️", desc: "Corre cualquier juego al máximo de gráficos.", power: 50 },
-        { name: "Monitor Gigante OLED 240Hz", icon: "📺", desc: "Fluidez extrema sin lag para ganar siempre.", power: 49 },
-        { name: "Silla Gamer Ultracómoda", icon: "🪑", desc: "Horas de juego sin dolor de espalda.", power: 48 },
-        { name: "Consola de Última Generación", icon: "🎮", desc: "Con todos los juegos exclusivos instalados.", power: 47 },
-        { name: "Gafas de Realidad Virtual", icon: "🥽", desc: "Siente que estás dentro del propio videojuego.", power: 46 }
-      ]
-    },
-    isla_privada: {
-      title: "Isla Privada de Lujo",
-      icon: "🏝️",
-      items: [
-        { name: "Mansión Moderna Frente al Mar", icon: "🏰", desc: "Vistas espectaculares a la playa.", power: 50 },
-        { name: "Yate de Lujo Privado", icon: "🛥️", desc: "Para navegar por la costa de la isla.", power: 49 },
-        { name: "Helicóptero y Helipuerto", icon: "🚁", desc: "Transporte rápido y exclusivo.", power: 48 },
-        { name: "Playa Privada de Arena Blanca", icon: "🏖️", desc: "Tranquilidad absoluta sin interrupciones.", power: 47 }
+        { name: { es: "PC RTX 4090", en: "PC RTX 4090", zh: "顶级电脑", ru: "ПК RTX 4090" }, icon: "🖥️", desc: { es: "Máxima potencia.", en: "Max power.", zh: "性能怪兽。", ru: "Макс. мощность." }, power: 50 },
+        { name: { es: "Monitor OLED 240Hz", en: "240Hz Monitor", zh: "240Hz显示器", ru: "Монитор 240Гц" }, icon: "📺", desc: { es: "Fluidez total.", en: "Ultra smooth.", zh: "极致丝滑。", ru: "Плавность." }, power: 49 }
       ]
     }
   };
 
-  // ESTADO DEL JUEGO
-  let gameMode = '2p'; // '2p' o 'bot'
-  let botDifficulty = 'easy'; // 'easy', 'medium', 'hard'
-  let selectedCategoryKey = null;
-  let remainingItems = [];
-  let currentItem = null;
+  let gameMode = '2p';
+  let botDiff = 'easy';
+  let selectedCategoryKey = 'tridente_futbol';
+  let availablePool = [];
+  
+  let p1 = { money: 20, inventory: [] };
+  let p2 = { money: 20, inventory: [] };
+  
   let currentBid = 0;
-  let currentBidder = 0; // 0: Nadie, 1: P1, 2: P2/Bot
-  let activeTurn = 1; 
+  let highestBidder = 0;
+  let activeItem = null;
+  let isSpinning = false;
 
-  let p1 = { money: 20, items: [], passed: false };
-  let p2 = { money: 20, items: [], passed: false };
-
-  // INICIALIZACIÓN
   window.onload = () => {
-    renderCategories();
+    changeLanguage('es');
   };
+
+  function changeLanguage(lang) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`lang-${lang}`).classList.add('active');
+
+    const t = I18N[lang];
+    document.getElementById('txt-subtitle').innerText = t.subtitle;
+    document.getElementById('txt-back').innerText = t.back;
+    document.getElementById('txt-step1').innerText = t.step1;
+    document.getElementById('txt-mode-2p').innerText = t.mode2p;
+    document.getElementById('txt-mode-bot').innerText = t.modeBot;
+    document.getElementById('txt-bot-diff').innerText = t.botDiff;
+    document.getElementById('txt-easy').innerText = t.easy;
+    document.getElementById('txt-medium').innerText = t.medium;
+    document.getElementById('txt-hard').innerText = t.hard;
+    document.getElementById('txt-step2').innerText = t.step2;
+    document.getElementById('txt-current-bid').innerText = t.currentBid;
+    document.getElementById('txt-bidder-label').innerText = t.bidderLabel;
+    document.getElementById('txt-pass-p1').innerText = t.pass;
+    document.getElementById('txt-pass-p2').innerText = t.pass;
+    document.getElementById('txt-inv-p1').innerText = t.yourItems;
+    document.getElementById('txt-inv-p2').innerText = t.theirItems;
+    document.getElementById('txt-play-again').innerText = t.playAgain;
+
+    document.getElementById('p1-title').innerText = t.p1;
+    document.getElementById('res-p1-title').innerText = t.p1;
+    document.getElementById('p2-title').innerText = gameMode === 'bot' ? t.bot : t.p2;
+    document.getElementById('res-p2-title').innerText = gameMode === 'bot' ? t.bot : t.p2;
+
+    renderCategorySelection();
+  }
 
   function selectMode(mode) {
     gameMode = mode;
     document.getElementById('btn-mode-2p').classList.toggle('selected', mode === '2p');
     document.getElementById('btn-mode-bot').classList.toggle('selected', mode === 'bot');
-    document.getElementById('bot-difficulty-section').style.display = (mode === 'bot') ? 'block' : 'none';
-    document.getElementById('p2-title').textContent = (mode === 'bot') ? 'SubasBot' : 'Jugador 2';
-    document.getElementById('res-p2-title').textContent = (mode === 'bot') ? 'SubasBot' : 'Jugador 2';
+    document.getElementById('bot-difficulty-section').style.display = mode === 'bot' ? 'block' : 'none';
+    changeLanguage(currentLang);
   }
 
   function selectDiff(diff) {
-    botDifficulty = diff;
+    botDiff = diff;
     document.getElementById('diff-easy').classList.toggle('selected', diff === 'easy');
     document.getElementById('diff-medium').classList.toggle('selected', diff === 'medium');
     document.getElementById('diff-hard').classList.toggle('selected', diff === 'hard');
   }
 
-  function renderCategories() {
+  function renderCategorySelection() {
     const grid = document.getElementById('categories-grid');
     grid.innerHTML = '';
-    for (const key in CATEGORIES_DATA) {
+    
+    for (let key in CATEGORIES_DATA) {
       const cat = CATEGORIES_DATA[key];
       const card = document.createElement('div');
       card.className = 'cat-card';
-      card.onclick = () => startGame(key);
       card.innerHTML = `
         <div class="cat-icon">${cat.icon}</div>
-        <strong>${cat.title}</strong>
+        <strong>${cat.title[currentLang]}</strong>
       `;
+      card.onclick = () => startGame(key);
       grid.appendChild(card);
     }
   }
 
-  function startGame(categoryKey) {
-    selectedCategoryKey = categoryKey;
-    const cat = CATEGORIES_DATA[categoryKey];
-    remainingItems = [...cat.items];
-
-    p1 = { money: 20, items: [], passed: false };
-    p2 = { money: 20, items: [], passed: false };
+  function startGame(catKey) {
+    selectedCategoryKey = catKey;
+    const cat = CATEGORIES_DATA[catKey];
+    availablePool = [...cat.items];
+    
+    p1 = { money: 20, inventory: [] };
+    p2 = { money: 20, inventory: [] };
 
     document.getElementById('menu-screen').style.display = 'none';
+    document.getElementById('results-screen').style.display = 'none';
     document.getElementById('auction-screen').style.display = 'block';
-    document.getElementById('results-screen').style.display = 'none';
-    document.getElementById('nav-back-btn').style.display = 'flex';
+    document.getElementById('nav-back-btn').style.display = 'inline-flex';
+    
+    document.getElementById('auction-category-title').innerText = `${cat.icon} ${cat.title[currentLang]}`;
 
-    document.getElementById('auction-category-title').textContent = `${cat.icon} ${cat.title}`;
-
-    updateUI();
-    nextAuctionRound();
+    spinRouletteAndLoadItem();
   }
 
-  function goToMenu() {
-    document.getElementById('menu-screen').style.display = 'block';
-    document.getElementById('auction-screen').style.display = 'none';
-    document.getElementById('results-screen').style.display = 'none';
-    document.getElementById('nav-back-btn').style.display = 'none';
-  }
-
-  function nextAuctionRound() {
-    if (remainingItems.length === 0 || (p1.items.length >= 4 && p2.items.length >= 4)) {
+  function spinRouletteAndLoadItem() {
+    if (p1.inventory.length >= 4 && p2.inventory.length >= 4) {
       endGame();
       return;
     }
 
-    currentBid = 0;
-    currentBidder = 0;
-    p1.passed = (p1.items.length >= 4);
-    p2.passed = (p2.items.length >= 4);
-
-    // Animación de Ruleta
-    const box = document.getElementById('item-display-box');
-    box.classList.add('roulette-spin');
-    document.getElementById('item-name').textContent = "GIRANDO RULETA...";
-    document.getElementById('item-desc').textContent = "Buscando el siguiente objeto...";
-
-    setTimeout(() => {
-      box.classList.remove('roulette-spin');
-      const randomIndex = Math.floor(Math.random() * remainingItems.length);
-      currentItem = remainingItems.splice(randomIndex, 1)[0];
-
-      document.getElementById('item-icon').textContent = currentItem.icon;
-      document.getElementById('item-name').textContent = currentItem.name;
-      document.getElementById('item-desc').textContent = currentItem.desc;
-
-      activeTurn = 1;
-      updateUI();
-      checkBotTurn();
-    }, 800);
-  }
-
-  function playerBid(player, amount) {
-    const p = (player === 1) ? p1 : p2;
-    if (p.money >= currentBid + amount) {
-      currentBid += amount;
-      currentBidder = player;
-      p1.passed = false;
-      p2.passed = false;
-      activeTurn = (player === 1) ? 2 : 1;
-      updateUI();
-      checkBotTurn();
+    if (p1.inventory.length >= 4) {
+      const randIdx = Math.floor(Math.random() * availablePool.length);
+      p2.inventory.push(availablePool.splice(randIdx, 1)[0]);
+      spinRouletteAndLoadItem();
+      return;
     }
-  }
-
-  function playerPass(player) {
-    if (player === 1) p1.passed = true;
-    if (player === 2) p2.passed = true;
-
-    if (p1.passed && p2.passed) {
-      resolveAuction();
-    } else {
-      activeTurn = (player === 1) ? 2 : 1;
-      updateUI();
-      checkBotTurn();
-    }
-  }
-
-  function checkBotTurn() {
-    if (gameMode === 'bot' && activeTurn === 2 && !p2.passed) {
-      document.getElementById('p2-bot-status').textContent = "Pensando puja...";
-      setTimeout(() => {
-        botDecision();
-      }, 1000);
-    }
-  }
-
-  function botDecision() {
-    const canAfford1 = p2.money >= currentBid + 1;
-    const canAfford2 = p2.money >= currentBid + 2;
-
-    if (!canAfford1 || p2.items.length >= 4) {
-      playerPass(2);
+    if (p2.inventory.length >= 4) {
+      const randIdx = Math.floor(Math.random() * availablePool.length);
+      p1.inventory.push(availablePool.splice(randIdx, 1)[0]);
+      spinRouletteAndLoadItem();
       return;
     }
 
-    let shouldBid = false;
-    if (botDifficulty === 'easy') {
-      shouldBid = Math.random() > 0.4;
-    } else if (botDifficulty === 'medium') {
-      shouldBid = currentItem.power > 35 || currentBid < 5;
-    } else { // Hard
-      shouldBid = (currentItem.power > 40 && currentBid < p2.money - 3) || (p1.money < currentBid);
-    }
+    isSpinning = true;
+    const displayBox = document.getElementById('item-display-box');
+    displayBox.classList.add('roulette-spin');
+    
+    let spins = 0;
+    const interval = setInterval(() => {
+      const randomTemp = availablePool[Math.floor(Math.random() * availablePool.length)];
+      document.getElementById('item-icon').innerText = randomTemp.icon;
+      document.getElementById('item-name').innerText = randomTemp.name[currentLang];
+      document.getElementById('item-desc').innerText = I18N[currentLang].spinningDesc;
+      spins++;
 
-    if (shouldBid && canAfford1) {
-      const increment = (canAfford2 && Math.random() > 0.7) ? 2 : 1;
-      playerBid(2, increment);
+      if (spins >= 10) {
+        clearInterval(interval);
+        displayBox.classList.remove('roulette-spin');
+        
+        const chosenIndex = Math.floor(Math.random() * availablePool.length);
+        activeItem = availablePool.splice(chosenIndex, 1)[0];
+
+        document.getElementById('item-icon').innerText = activeItem.icon;
+        document.getElementById('item-name').innerText = activeItem.name[currentLang];
+        document.getElementById('item-desc').innerText = activeItem.desc[currentLang];
+
+        currentBid = 0;
+        highestBidder = 0;
+        isSpinning = false;
+        updateUI();
+
+        if (gameMode === 'bot') setTimeout(botDecision, 800);
+      }
+    }, 100);
+  }
+
+  function playerBid(player, increment) {
+    if (isSpinning) return;
+    const p = player === 1 ? p1 : p2;
+    if (currentBid + increment > p.money) return;
+
+    currentBid += increment;
+    highestBidder = player;
+    updateUI();
+
+    if (gameMode === 'bot' && player === 1) setTimeout(botDecision, 900);
+  }
+
+  function playerPass(player) {
+    if (isSpinning) return;
+    if (highestBidder === 0) {
+      awardItem(player === 1 ? 2 : 1, 0);
     } else {
-      playerPass(2);
+      awardItem(highestBidder, currentBid);
     }
   }
 
-  function resolveAuction() {
-    if (currentBidder === 1) {
-      p1.money -= currentBid;
-      p1.items.push(currentItem);
-    } else if (currentBidder === 2) {
-      p2.money -= currentBid;
-      p2.items.push(currentItem);
+  function awardItem(winner, cost = currentBid) {
+    if (winner === 1) {
+      p1.money -= cost;
+      p1.inventory.push(activeItem);
+    } else {
+      p2.money -= cost;
+      p2.inventory.push(activeItem);
     }
+    spinRouletteAndLoadItem();
+  }
 
-    updateUI();
-    setTimeout(() => {
-      nextAuctionRound();
-    }, 1200);
+  function botDecision() {
+    if (isSpinning || highestBidder === 2) return;
+    document.getElementById('p2-bot-status').innerText = I18N[currentLang].botThinking;
+
+    if (currentBid + 1 <= p2.money && activeItem.power > 40) {
+      currentBid += 1;
+      highestBidder = 2;
+      document.getElementById('p2-bot-status').innerText = I18N[currentLang].botBid;
+      updateUI();
+    } else {
+      document.getElementById('p2-bot-status').innerText = I18N[currentLang].botPassed;
+      setTimeout(() => playerPass(2), 500);
+    }
   }
 
   function updateUI() {
-    document.getElementById('p1-money').textContent = p1.money;
-    document.getElementById('p2-money').textContent = p2.money;
-    document.getElementById('p1-count').textContent = p1.items.length;
-    document.getElementById('p2-count').textContent = p2.items.length;
+    const t = I18N[currentLang];
+    document.getElementById('p1-money').innerText = p1.money;
+    document.getElementById('p2-money').innerText = p2.money;
+    document.getElementById('p1-count').innerText = p1.inventory.length;
+    document.getElementById('p2-count').innerText = p2.inventory.length;
+    document.getElementById('current-bid-amount').innerText = `${currentBid} €`;
 
-    document.getElementById('current-bid-amount').textContent = currentBid + " €";
-    document.getElementById('current-bidder-name').textContent = 
-      currentBidder === 0 ? "Nadie" : (currentBidder === 1 ? "Jugador 1" : (gameMode === 'bot' ? "SubasBot" : "Jugador 2"));
+    let bidderText = t.nobody;
+    if (highestBidder === 1) bidderText = t.p1;
+    if (highestBidder === 2) bidderText = gameMode === 'bot' ? t.bot : t.p2;
+    document.getElementById('current-bidder-name').innerText = bidderText;
 
-    // Inventarios
-    renderInventory('p1-inventory', p1.items);
-    renderInventory('p2-inventory', p2.items);
-
-    // Deshabilitar botones si no tienen dinero o pasaron
-    const p1Disabled = activeTurn !== 1 || p1.passed || p1.items.length >= 4;
-    document.getElementById('p1-btn-1').disabled = p1Disabled || p1.money < currentBid + 1;
-    document.getElementById('p1-btn-2').disabled = p1Disabled || p1.money < currentBid + 2;
-    document.getElementById('p1-btn-pass').disabled = p1Disabled;
-
-    const p2Disabled = activeTurn !== 2 || p2.passed || p2.items.length >= 4 || gameMode === 'bot';
-    document.getElementById('p2-btn-1').disabled = p2Disabled || p2.money < currentBid + 1;
-    document.getElementById('p2-btn-2').disabled = p2Disabled || p2.money < currentBid + 2;
-    document.getElementById('p2-btn-pass').disabled = p2Disabled;
+    renderInv('p1-inventory', p1.inventory);
+    renderInv('p2-inventory', p2.inventory);
+    document.getElementById('p2-controls').style.display = gameMode === 'bot' ? 'none' : 'flex';
   }
 
-  function renderInventory(containerId, items) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '';
-    items.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'inv-item';
-      div.innerHTML = `<span>${item.icon}</span> <span>${item.name}</span>`;
-      container.appendChild(div);
-    });
+  function renderInv(elementId, items) {
+    document.getElementById(elementId).innerHTML = items.map(i => `<div class="inv-item">${i.icon} ${i.name[currentLang]}</div>`).join('');
   }
 
   function endGame() {
     document.getElementById('auction-screen').style.display = 'none';
     document.getElementById('results-screen').style.display = 'block';
 
-    const p1Score = p1.items.reduce((acc, item) => acc + item.power, 0) + p1.money;
-    const p2Score = p2.items.reduce((acc, item) => acc + item.power, 0) + p2.money;
-
-    const winnerText = document.getElementById('winner-title');
-    const expBox = document.getElementById('winner-explanation');
-
-    const p2Name = gameMode === 'bot' ? 'SubasBot' : 'Jugador 2';
+    const p1Score = p1.inventory.reduce((acc, i) => acc + i.power, 0) + p1.money;
+    const p2Score = p2.inventory.reduce((acc, i) => acc + i.power, 0) + p2.money;
+    const t = I18N[currentLang];
 
     if (p1Score > p2Score) {
-      winnerText.textContent = "🏆 ¡Gana Jugador 1!";
+      document.getElementById('winner-title').innerText = t.winP1;
     } else if (p2Score > p1Score) {
-      winnerText.textContent = `🏆 ¡Gana ${p2Name}!`;
+      document.getElementById('winner-title').innerText = gameMode === 'bot' ? t.winBot : t.winP2;
     } else {
-      winnerText.textContent = "🤝 ¡Empate Técnico!";
+      document.getElementById('winner-title').innerText = t.draw;
     }
 
-    expBox.innerHTML = `
-      <strong>Puntuación Final:</strong><br>
-      • <strong>Jugador 1:</strong> ${p1Score} Puntos (${p1.items.length} Objetos + ${p1.money}€ restantes)<br>
-      • <strong>${p2Name}:</strong> ${p2Score} Puntos (${p2.items.length} Objetos + ${p2.money}€ restantes)
-    `;
+    renderInv('res-p1-inv', p1.inventory);
+    renderInv('res-p2-inv', p2.inventory);
+  }
 
-    renderInventory('res-p1-inv', p1.items);
-    renderInventory('res-p2-inv', p2.items);
+  function goToMenu() {
+    document.getElementById('auction-screen').style.display = 'none';
+    document.getElementById('results-screen').style.display = 'none';
+    document.getElementById('menu-screen').style.display = 'block';
+    document.getElementById('nav-back-btn').style.display = 'none';
   }
 </script>
 
