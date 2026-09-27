@@ -77,18 +77,17 @@
     .inventory-title { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px; }
     .inventory-list { display: flex; gap: 8px; flex-wrap: wrap; }
     .inv-item { background: #334155; padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; border: 1px solid #475569; }
+    .inv-item.gifted { border-color: #f59e0b; background: #2d261e; }
 
     .bid-status { text-align: center; font-size: 1.3rem; margin: 15px 0; padding: 10px; background: #334155; border-radius: 8px; }
     .highest-bidder { color: #f59e0b; font-weight: bold; }
 
     #results-screen { display: none; text-align: center; }
-    .winner-announcement { font-size: 2.2rem; color: #f59e0b; margin-bottom: 15px; font-weight: bold; }
-    
-    .ai-report-box { background: #1e293b; padding: 25px; border-radius: 12px; font-size: 1rem; line-height: 1.6; margin-bottom: 25px; border: 2px solid #f59e0b; text-align: left; }
-    .report-card { background: #0f172a; border-radius: 10px; padding: 15px; margin-top: 15px; border: 1px solid #334155; }
-    .report-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #1e293b; }
-    .report-row:last-child { border-bottom: none; }
-    .gift-tag { background: #d97706; color: #fff; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+    .winner-announcement { font-size: 2rem; color: #f59e0b; margin-bottom: 15px; }
+    .ai-report-box { background: #1e293b; padding: 20px; border-radius: 12px; font-size: 1.05rem; line-height: 1.6; margin-bottom: 25px; border: 2px solid #f59e0b; text-align: left; }
+
+    .roulette-spin { animation: pulse 0.15s infinite alternate; }
+    @keyframes pulse { from { opacity: 0.4; transform: scale(0.98); } to { opacity: 1; transform: scale(1.02); } }
 
     @media (max-width: 600px) {
       header { flex-direction: column; align-items: flex-start; }
@@ -147,7 +146,7 @@
   <div id="auction-screen">
     <div class="auction-header">
       <span id="auction-category-title" style="font-size: 1.2rem; font-weight: bold;"></span>
-      <span id="items-left-count" style="color: #f59e0b; font-weight: bold;">Objeto 1 de 8</span>
+      <span id="items-left-count" style="color: var(--text-muted);">Lote</span>
     </div>
 
     <div class="turn-indicator p1-turn" id="turn-banner">
@@ -202,19 +201,19 @@
       <div class="winner-announcement" id="winner-title">🏆 ¡Tenemos Ganador!</div>
       
       <div class="ai-report-box" id="ai-report">
-        <!-- Generado dinámicamente -->
+        <!-- Razón de la victoria generada aquí -->
       </div>
       
       <div class="grid-2">
         <div class="player-box p1">
           <h3 id="res-p1-title">Jugador 1</h3>
           <div style="margin-top: 5px; font-weight: bold; color: #10b981;">💰 <span id="res-p1-money">0</span> € restantes</div>
-          <div class="inventory-list" id="res-p1-inv" style="margin-top:10px;"></div>
+          <div class="inventory-list" id="res-p1-inv" style="margin-top:15px;"></div>
         </div>
         <div class="player-box p2">
           <h3 id="res-p2-title">Jugador 2</h3>
           <div style="margin-top: 5px; font-weight: bold; color: #10b981;">💰 <span id="res-p2-money">0</span> € restantes</div>
-          <div class="inventory-list" id="res-p2-inv" style="margin-top:10px;"></div>
+          <div class="inventory-list" id="res-p2-inv" style="margin-top:15px;"></div>
         </div>
       </div>
       <br>
@@ -270,142 +269,201 @@
     }
   };
 
+  // BANCO EXTENSO DE OBJETOS (20 O MÁS POR TEMÁTICA)
   const CATEGORIES_DATA = {
     tridente_futbol: {
-      icon: "⚽", title: { es: "Estrellas del Fútbol", en: "Football Stars", zh: "足球巨星", ru: "Звезды футбола" },
+      icon: "⚽", title: { es: "Tridente de Fútbol", en: "Football Trio", zh: "足球三叉戟", ru: "Футбольное трио" },
       items: [
-        { id: "f1", name: { es: "Lionel Messi", en: "Lionel Messi", zh: "梅西", ru: "Лионель Месси" }, icon: "🐐", desc: { es: "Leyenda absoluta, visión y gol.", en: "Absolute legend.", zh: "绝代双骄", ru: "Легенда" }, power: 50 },
-        { id: "f2", name: { es: "Cristiano Ronaldo", en: "Cristiano Ronaldo", zh: "C罗", ru: "Криштиану Роналду" }, icon: "👑", desc: { es: "Máximo goleador histórico.", en: "Top scorer.", zh: "历史射手王", ru: "Бомбардир" }, power: 50 },
-        { id: "f3", name: { es: "Kylian Mbappé", en: "Kylian Mbappé", zh: "姆巴佩", ru: "Килиан Мбаппе" }, icon: "⚡", desc: { es: "Velocidad imparable.", en: "Unstoppable speed.", zh: "极致速度", ru: "Скорость" }, power: 46 },
-        { id: "f4", name: { es: "Erling Haaland", en: "Erling Haaland", zh: "哈兰德", ru: "Эрлинг Холанн" }, icon: "🤖", desc: { es: "Cyborg del área, potencia pura.", en: "Box cyborg.", zh: "禁区霸主", ru: "Мощь" }, power: 45 },
-        { id: "f5", name: { es: "Neymar Jr", en: "Neymar Jr", zh: "内马尔", ru: "Неймар" }, icon: "🪄", desc: { es: "Regate y magia brasileña.", en: "Brazilian magic.", zh: "桑巴花式", ru: "Магия" }, power: 40 },
-        { id: "f6", name: { es: "Kevin De Bruyne", en: "Kevin De Bruyne", zh: "德布劳内", ru: "Кевин Де Брёйне" }, icon: "🎯", desc: { es: "Pases milimétricos impecables.", en: "Master passer.", zh: "手术刀传球", ru: "Пасы" }, power: 44 },
-        { id: "f7", name: { es: "Jude Bellingham", en: "Jude Bellingham", zh: "贝林厄姆", ru: "Джуд Беллингем" }, icon: "🌟", desc: { es: "Llegada desde segunda línea.", en: "Young prodigy.", zh: "大英帝星", ru: "Звезда" }, power: 43 },
-        { id: "f8", name: { es: "Vinícius Jr", en: "Vinícius Jr", zh: "维尼修斯", ru: "Винисиус Жоао" }, icon: "⚡", desc: { es: "Desborde y vértigo total.", en: "Electric winger.", zh: "闪电突破", ru: "Дриблинг" }, power: 44 },
-        { id: "f9", name: { es: "Luka Modrić", en: "Luka Modrić", zh: "莫德里奇", ru: "Лука Модрич" }, icon: "🎼", desc: { es: "Elegancia y control del juego.", en: "Midfield maestro.", zh: "中场大师", ru: "Маэстро" }, power: 41 },
-        { id: "f10", name: { es: "Mohamed Salah", en: "Mohamed Salah", zh: "萨拉赫", ru: "Мохамед Салах" }, icon: "👑", desc: { es: "El Rey Egipcio del gol.", en: "Egyptian King.", zh: "法老王", ru: "Король" }, power: 42 },
-        { id: "f11", name: { es: "Robert Lewandowski", en: "Robert Lewandowski", zh: "莱万", ru: "Роберт Левандовский" }, icon: "🎯", desc: { es: "Instinto asesino en el área.", en: "Goal machine.", zh: "神锋", ru: "Голеадор" }, power: 41 },
-        { id: "f12", name: { es: "Antoine Griezmann", en: "Antoine Griezmann", zh: "格列兹曼", ru: "Антуан Гризманн" }, icon: "🎨", desc: { es: "Inteligencia táctica y entrega.", en: "Tactical brain.", zh: "战术核心", ru: "Мозг" }, power: 39 },
-        { id: "f13", name: { es: "Harry Kane", en: "Harry Kane", zh: "凯恩", ru: "Харри Кейн" }, icon: "🏹", desc: { es: "El 9 total, visión y disparo.", en: "Complete striker.", zh: "全能中锋", ru: "Снайпер" }, power: 42 },
-        { id: "f14", name: { es: "Lamine Yamal", en: "Lamine Yamal", zh: "亚马尔", ru: "Ламин Ямаль" }, icon: "💎", desc: { es: "La perla joven más brillante.", en: "Wonderkid.", zh: "绝世天才", ru: "Гений" }, power: 43 },
-        { id: "f15", name: { es: "Rodri", en: "Rodri", zh: "罗德里", ru: "Родри" }, icon: "🧠", desc: { es: "Equilibrio defensivo y pase.", en: "Tactical anchor.", zh: "节拍器", ru: "Опора" }, power: 44 },
-        { id: "f16", name: { es: "Lautaro Martínez", en: "Lautaro Martínez", zh: "劳塔罗", ru: "Лаутаро Мартинес" }, icon: "🐂", desc: { es: "Garra y efectividad máxima.", en: "The Bull.", zh: "公牛", ru: "Бык" }, power: 38 },
-        { id: "f17", name: { es: "Pedri", en: "Pedri", zh: "佩德里", ru: "Педри" }, icon: "🪄", desc: { es: "Visión de juego privileged.", en: "Pure vision.", zh: "球商卓绝", ru: "Видение" }, power: 37 },
-        { id: "f18", name: { es: "Bukayo Saka", en: "Bukayo Saka", zh: "萨卡", ru: "Букайо Сака" }, icon: "🌶️", desc: { es: "Descaro y constancia en banda.", en: "Starboy.", zh: "阿森纳核心", ru: "Атака" }, power: 39 },
-        { id: "f19", name: { es: "Son Heung-min", en: "Son Heung-min", zh: "孙兴慜", ru: "Сон Хын Мин" }, icon: "🚀", desc: { es: "Disparo perfecto ambidextro.", en: "Two-footed sniper.", zh: "亚洲之光", ru: "Выстрел" }, power: 38 },
-        { id: "f20", name: { es: "Toni Kroos", en: "Toni Kroos", zh: "克罗斯", ru: "Тони Кроос" }, icon: "📐", desc: { es: "Precisión alemana absoluta.", en: "Precision master.", zh: "精密仪器", ru: "Точность" }, power: 41 }
+        { name: { es: "Lionel Messi", en: "Lionel Messi", zh: "梅西", ru: "Лионель Месси" }, icon: "🐐", desc: { es: "Leyenda absoluta, visión y gol.", en: "Absolute legend.", zh: "球王视界。", ru: "Легенда." }, power: 50 },
+        { name: { es: "Cristiano Ronaldo", en: "Cristiano Ronaldo", zh: "C罗", ru: "Криштиану Роналду" }, icon: "👑", desc: { es: "Máximo goleador histórico.", en: "Top scorer.", zh: "进球机器。", ru: "Бомбардир." }, power: 50 },
+        { name: { es: "Kylian Mbappé", en: "Kylian Mbappé", zh: "姆巴佩", ru: "Килиан Мбаппе" }, icon: "⚡", desc: { es: "Velocidad imparable.", en: "Unstoppable speed.", zh: "极致速度。", ru: "Скорость." }, power: 45 },
+        { name: { es: "Erling Haaland", en: "Erling Haaland", zh: "哈兰德", ru: "Эрлинг Холанн" }, icon: "🤖", desc: { es: "Cyborg del área, potencia pura.", en: "Pure power.", zh: "禁区霸主。", ru: "Мощь." }, power: 44 },
+        { name: { es: "Neymar Jr", en: "Neymar Jr", zh: "内马尔", ru: "Неймар" }, icon: "🪄", desc: { es: "Magia y regate brasileño.", en: "Brazilian flair.", zh: "华丽盘带。", ru: "Магия." }, power: 40 },
+        { name: { es: "Vinícius Jr", en: "Vinícius Jr", zh: "维尼修斯", ru: "Винисиус Жоао" }, icon: "🔥", desc: { es: "Desborde eléctrico.", en: "Electric dribbling.", zh: "突破犀利。", ru: "Дриблинг." }, power: 43 },
+        { name: { es: "Mohamed Salah", en: "Mohamed Salah", zh: "萨拉赫", ru: "Мохаммед Салах" }, icon: "👑", desc: { es: "El rey egipcio del gol.", en: "Egyptian King.", zh: "埃及法老。", ru: "Фараон." }, power: 41 },
+        { name: { es: "Robert Lewandowski", en: "Robert Lewandowski", zh: "莱万多夫斯基", ru: "Роберт Левандовский" }, icon: "🎯", desc: { es: "Récord de goles en área.", en: "Lethal finisher.", zh: "神射手。", ru: "Финишер." }, power: 42 },
+        { name: { es: "Kevin De Bruyne", en: "Kevin De Bruyne", zh: "德布劳内", ru: "Кевин Де Брёйне" }, icon: "🎯", desc: { es: "Asistencias milimétricas.", en: "Master passer.", zh: "中场大师。", ru: "Пас." }, power: 44 },
+        { name: { es: "Lamine Yamal", en: "Lamine Yamal", zh: "亚马尔", ru: "Ламин Ямаль" }, icon: "🌟", desc: { es: "Joven prodigio mundial.", en: "Wonderkid.", zh: "天才少年。", ru: "Вундеркинд." }, power: 39 },
+        { name: { es: "Harry Kane", en: "Harry Kane", zh: "凯恩", ru: "Гарри Кейн" }, icon: "🏹", desc: { es: "Disparo impecable.", en: "Master striker.", zh: "神锋。", ru: "Удар." }, power: 41 },
+        { name: { es: "Jude Bellingham", en: "Jude Bellingham", zh: "贝林厄姆", ru: "Джуд Беллингем" }, icon: "🌟", desc: { es: "Llegada y gol decisivo.", en: "Clutch midfielder.", zh: "全能中场。", ru: "Полузащитник." }, power: 43 },
+        { name: { es: "Antoine Griezmann", en: "Antoine Griezmann", zh: "格列兹曼", ru: "Антуан Гризманн" }, icon: "🎭", desc: { es: "Inteligencia táctica.", en: "Tactical genius.", zh: "战术核心。", ru: "Гений." }, power: 38 },
+        { name: { es: "Lautaro Martínez", en: "Lautaro Martínez", zh: "劳塔罗", ru: "Лаутаро Мартинес" }, icon: "🐂", desc: { es: "El Toro del gol.", en: "The Bull.", zh: "公牛射手。", ru: "Бык." }, power: 37 },
+        { name: { es: "Bukayo Saka", en: "Bukayo Saka", zh: "萨卡", ru: "Букайо Сака" }, icon: "🌶️", desc: { es: "Regate y desborde constante.", en: "Starboy.", zh: "阿森纳核心。", ru: "Звезда." }, power: 38 },
+        { name: { es: "Ronaldinho", en: "Ronaldinho", zh: "罗纳尔迪尼奥", ru: "Роналдиньо" }, icon: "🤙", desc: { es: "La sonrisa del fútbol.", en: "Football joy.", zh: "足球精灵。", ru: "Улыбка." }, power: 46 },
+        { name: { es: "Zinedine Zidane", en: "Zinedine Zidane", zh: "齐达内", ru: "Зинедин Зидан" }, icon: "🎩", desc: { es: "Elegancia pura.", en: "Pure class.", zh: "齐祖中场。", ru: "Класс." }, power: 47 },
+        { name: { es: "Thierry Henry", en: "Thierry Henry", zh: "亨利", ru: "Тьерри Анри" }, icon: "👑", desc: { es: "Clase y velocidad en rosca.", en: "Finesse king.", zh: "海布里之王。", ru: "Король." }, power: 44 },
+        { name: { es: "Luis Suárez", en: "Luis Suárez", zh: "苏亚雷斯", ru: "Луис Суарес" }, icon: "🔫", desc: { es: "Instinto asesino.", en: "Killer instinct.", zh: "神级跑位。", ru: "Инстинкт." }, power: 41 },
+        { name: { es: "Karim Benzema", en: "Karim Benzema", zh: "本泽马", ru: "Карим Бензема" }, icon: "⚔️", desc: { es: "Balón de Oro con clase.", en: "Ballon d'Or.", zh: "金球得主。", ru: "Золотой мяч." }, power: 42 }
+      ]
+    },
+    defensa_futbol: {
+      icon: "🛡️", title: { es: "Defensa de Fútbol", en: "Football Defence", zh: "防守长城", ru: "Футбольная защита" },
+      items: [
+        { name: { es: "Virgil van Dijk", en: "Virgil van Dijk", zh: "范戴克", ru: "Вирджил ван Дейк" }, icon: "🧱", desc: { es: "Muro infranqueable.", en: "Unbeatable wall.", zh: "后防铁壁。", ru: "Стена." }, power: 50 },
+        { name: { es: "Thibaut Courtois", en: "Thibaut Courtois", zh: "库尔图瓦", ru: "Тибо Куртуа" }, icon: "🧤", desc: { es: "Paradas milagrosas.", en: "Miracle saves.", zh: "极限扑救。", ru: "Сэйвы." }, power: 48 },
+        { name: { es: "Sergio Ramos", en: "Sergio Ramos", zh: "拉莫斯", ru: "Серхио Рамос" }, icon: "💥", desc: { es: "Liderazgo y garra.", en: "Grit & leadership.", zh: "铁血队长。", ru: "Лидер." }, power: 45 },
+        { name: { es: "Manuel Neuer", en: "Manuel Neuer", zh: "诺伊尔", ru: "Мануэль Нойер" }, icon: "🛡️", desc: { es: "El portero-líbero.", en: "Sweeper keeper.", zh: "门卫先驱。", ru: "Вратарь." }, power: 43 },
+        { name: { es: "Kyle Walker", en: "Kyle Walker", zh: "沃克", ru: "Кайл Уокер" }, icon: "🏎️", desc: { es: "Velocidad extrema.", en: "Extreme pace.", zh: "极致速度。", ru: "Скорость." }, power: 38 },
+        { name: { es: "Ruben Dias", en: "Ruben Dias", zh: "鲁本-迪亚斯", ru: "Рубен Диаш" }, icon: "🛡️", desc: { es: "Líder de la zaga.", en: "Defensive boss.", zh: "防守大脑。", ru: "Босс." }, power: 42 },
+        { name: { es: "Antonio Rüdiger", en: "Antonio Rüdiger", zh: "吕迪格", ru: "Антонио Рюдигер" }, icon: "🦍", desc: { es: "Marcaje feroz.", en: "Fierce defender.", zh: "强悍拦截。", ru: "Опека." }, power: 41 },
+        { name: { es: "Alphonso Davies", en: "Alphonso Davies", zh: "阿方索-戴维斯", ru: "Альфонсо Дэвис" }, icon: "⚡", desc: { es: "El coche de carreras.", en: "The Roadrunner.", zh: "加拿大闪电。", ru: "Молния." }, power: 39 },
+        { name: { es: "Achraf Hakimi", en: "Achraf Hakimi", zh: "阿什拉夫", ru: "Ашраф Хакими" }, icon: "🚀", desc: { es: "Lateral volador.", en: "Flying fullback.", zh: "飞翼边后卫。", ru: "Фланг." }, power: 40 },
+        { name: { es: "Paolo Maldini", en: "Paolo Maldini", zh: "马尔蒂尼", ru: "Паоло Мальдини" }, icon: "🏛️", desc: { es: "Elegancia defensiva.", en: "Defensive legend.", zh: "传奇队长。", ru: "Легенда." }, power: 49 },
+        { name: { es: "Roberto Carlos", en: "Roberto Carlos", zh: "罗伯托-卡洛斯", ru: "Роберто Карлос" }, icon: "💣", desc: { es: "Cañón en la pierna.", en: "Rocket left foot.", zh: "重炮轰门。", ru: "Пушка." }, power: 45 },
+        { name: { es: "Carles Puyol", en: "Carles Puyol", zh: "普约尔", ru: "Карлес Пуйоль" }, icon: "🦁", desc: { es: "Corazón de león.", en: "Lion heart.", zh: "狮子之心。", ru: "Сердце." }, power: 44 },
+        { name: { es: "Gianluigi Buffon", en: "Gianluigi Buffon", zh: "布冯", ru: "Джанлуиджи Буффон" }, icon: "🧤", desc: { es: "Leyenda bajo palos.", en: "Goalkeeping icon.", zh: "不老传奇。", ru: "Икона." }, power: 46 },
+        { name: { es: "Trent Alexander-Arnold", en: "Trent Alexander-Arnold", zh: "阿诺德", ru: "Трент Александер-Арнольд" }, icon: "🎯", desc: { es: "Guante en la derecha.", en: "Precision passer.", zh: "精准传中。", ru: "Пасы." }, power: 38 },
+        { name: { es: "Eder Militão", en: "Eder Militão", zh: "米利唐", ru: "Эдер Милитао" }, icon: "🧱", desc: { es: "Anticipación y contundencia.", en: "Solid stopper.", zh: "上抢果断。", ru: "Защитник." }, power: 37 },
+        { name: { es: "Marquinhos", en: "Marquinhos", zh: "马尔基尼奥斯", ru: "Маркиньос" }, icon: "🔰", desc: { es: "Experiencia y salida.", en: "Experienced CB.", zh: "巴西门闸。", ru: "Опыт." }, power: 37 },
+        { name: { es: "Theo Hernández", en: "Theo Hernández", zh: "特奥", ru: "Тео Эрнандес" }, icon: "🏎️", desc: { es: "Potencia por banda.", en: "Pacy left-back.", zh: "左路重炮。", ru: "Сила." }, power: 39 },
+        { name: { es: "Iker Casillas", en: "Iker Casillas", zh: "卡西利亚斯", ru: "Икер Касильяс" }, icon: "🧤", desc: { es: "El Santo.", en: "The Saint.", zh: "圣卡西。", ru: "Святой." }, power: 47 },
+        { name: { es: "Alessandro Nesta", en: "Alessandro Nesta", zh: "内斯塔", ru: "Алессандро Неста" }, icon: "📐", desc: { es: "Corte perfecto.", en: "Tackle master.", zh: "精准滑铲。", ru: "Мастер." }, power: 45 },
+        { name: { es: "Jules Koundé", en: "Jules Koundé", zh: "孔德", ru: "Жюль Кунде" }, icon: "🛡️", desc: { es: "Polivalencia y rapidez.", en: "Versatile defender.", zh: "多面手。", ru: "Универсал." }, power: 36 }
       ]
     },
     jardin: {
       icon: "🏡", title: { es: "Casa con Jardín", en: "Garden House", zh: "花园豪宅", ru: "Дом с садом" },
       items: [
-        { id: "j1", name: { es: "Piscina Privada", en: "Private Pool", zh: "私人泳池", ru: "Бассейн" }, icon: "🏊‍♂️", desc: { es: "Agua cristalina.", en: "Crystal water.", zh: "清澈泳池", ru: "Бассейн" }, power: 50 },
-        { id: "j2", name: { es: "Pista de Fútbol 5", en: "Mini Pitch", zh: "五人场", ru: "Мини-поле" }, icon: "⚽", desc: { es: "Césped perfecto.", en: "Perfect turf.", zh: "优质草坪", ru: "Газон" }, power: 48 },
-        { id: "j3", name: { es: "Barbacoa Gigante", en: "BBQ Grill", zh: "烧烤架", ru: "Барбекю" }, icon: "🍖", desc: { es: "Para grandes comidas.", en: "For big parties.", zh: "派对神器", ru: "Гриль" }, power: 40 },
-        { id: "j4", name: { es: "Jacuzzi Exterior", en: "Outdoor Jacuzzi", zh: "按摩池", ru: "Джакузи" }, icon: "🛁", desc: { es: "Relax total.", en: "Total relax.", zh: "放松身心", ru: "Релакс" }, power: 38 },
-        { id: "j5", name: { es: "Porche Chillout", en: "Chillout Porch", zh: "露台", ru: "Веранда" }, icon: "🛋️", desc: { es: "Sillones cómodos.", en: "Comfy sofas.", zh: "舒适沙发", ru: "Уют" }, power: 30 },
-        { id: "j6", name: { es: "Cancha de Baloncesto", en: "Basketball Court", zh: "篮球场", ru: "Баскетбольная площадка" }, icon: "🏀", desc: { es: "Para tiros libres al atardecer.", en: "Half court.", zh: "街球半场", ru: "Площадка" }, power: 42 },
-        { id: "j7", name: { es: "Huerto Ecológico", en: "Organic Garden", zh: "有机菜园", ru: "Огород" }, icon: "🥬", desc: { es: "Verduras frescas.", en: "Fresh vegetables.", zh: "绿色无公害", ru: "Овощи" }, power: 25 },
-        { id: "j8", name: { es: "Cine al Aire Libre", en: "Outdoor Cinema", zh: "露天影院", ru: "Уличный кинотеатр" }, icon: "🎬", desc: { es: "Proyector 4K nocturno.", en: "Night movies.", zh: "星空观影", ru: "Проектор" }, power: 45 },
-        { id: "j9", name: { es: "Sauna Finlandesa", en: "Finnish Sauna", zh: "芬兰桑拿", ru: "Сауна" }, icon: "🧖‍♂️", desc: { es: "Desintoxicación y calor.", en: "Pure heat.", zh: "蒸气放松", ru: "Парная" }, power: 36 },
-        { id: "j10", name: { es: "Casa en el Árbol", en: "Treehouse", zh: "树屋", ru: "Домик на дереве" }, icon: "🪵", desc: { es: "Aventura e infancia.", en: "Kids adventure.", zh: "童趣之所", ru: "Укрытие" }, power: 28 },
-        { id: "j11", name: { es: "Invernadero de Cristal", en: "Glass Greenhouse", zh: "玻璃温室", ru: "Теплица" }, icon: "🌱", desc: { es: "Plantas exóticas.", en: "Exotic plants.", zh: "珍稀植物", ru: "Растения" }, power: 26 },
-        { id: "j12", name: { es: "Cama Elástica", en: "Trampoline", zh: "蹦床", ru: "Батут" }, icon: "🤸", desc: { es: "Saltos infinitos.", en: "High jumps.", zh: "解压跳跃", ru: "Прыжки" }, power: 22 },
-        { id: "j13", name: { es: "Fuente Zen", en: "Zen Fountain", zh: "禅意水景", ru: "Фонтан" }, icon: "⛲", desc: { es: "Paz y tranquilidad.", en: "Peaceful water.", zh: "流水流水", ru: "Покой" }, power: 20 },
-        { id: "j14", name: { es: "Cancha de Pádel", en: "Padel Court", zh: "板式网球", ru: "Падель корт" }, icon: "🎾", desc: { es: "El deporte de moda.", en: "Pro padel.", zh: "流行网球", ru: "Корт" }, power: 46 },
-        { id: "j15", name: { es: "Pista de Bowling", en: "Bowling Lane", zh: "保龄球道", ru: "Боулинг" }, icon: "🎳", desc: { es: "Diversión nocturna.", en: "Home bowling.", zh: "家庭保龄球", ru: "Страйк" }, power: 41 },
-        { id: "j16", name: { es: "Tumbonas de Lujo", en: "Luxury Loungers", zh: "豪华躺椅", ru: "Шезлонги" }, icon: "🏖️", desc: { es: "Bronceado perfecto.", en: "Sunbathing.", zh: "日光浴", ru: "Загар" }, power: 18 },
-        { id: "j17", name: { es: "Cabaña de Masajes", en: "Massage Hut", zh: "按摩亭", ru: "Массажный домик" }, icon: "💆‍♀️", desc: { es: "Spa en casa.", en: "Home spa.", zh: "家庭SPA", ru: "Спа" }, power: 34 },
-        { id: "j18", name: { es: "Parrilla Japonesa", en: "Hibachi Grill", zh: "日式烧烤", ru: "Японский гриль" }, icon: "🍱", desc: { es: "Cena teppanyaki.", en: "Teppanyaki show.", zh: "铁板烧", ru: "Еда" }, power: 33 },
-        { id: "j19", name: { es: "Parque Infantil", en: "Playground", zh: "儿童游乐场", ru: "Детская площадка" }, icon: "🛝", desc: { es: "Toboganes y columpios.", en: "Swings & slides.", zh: "滑梯秋千", ru: "Качели" }, power: 24 },
-        { id: "j20", name: { es: "Cerezo Japonés", en: "Cherry Blossom Tree", zh: "樱花树", ru: "Сакура" }, icon: "🌸", desc: { es: "Flores en primavera.", en: "Sakura beauty.", zh: "绝美粉樱", ru: "Красота" }, power: 31 }
+        { name: { es: "Piscina Privada", en: "Private Pool", zh: "私人泳池", ru: "Бассейн" }, icon: "🏊‍♂️", desc: { es: "Agua cristalina.", en: "Crystal water.", zh: "清澈泳池。", ru: "Бассейн." }, power: 50 },
+        { name: { es: "Pista de Fútbol 5", en: "Mini Pitch", zh: "五人制足球场", ru: "Мини-поле" }, icon: "⚽", desc: { es: "Césped perfecto.", en: "Perfect turf.", zh: "优质草坪。", ru: "Газон." }, power: 48 },
+        { name: { es: "Barbacoa Gigante", en: "BBQ Grill", zh: "大型烧烤架", ru: "Барбекю" }, icon: "🍖", desc: { es: "Para grandes comidas.", en: "For big parties.", zh: "派对必备。", ru: "Барбекю." }, power: 40 },
+        { name: { es: "Jacuzzi Exterior", en: "Outdoor Jacuzzi", zh: "露天按摩池", ru: "Джакузи" }, icon: "🛁", desc: { es: "Relax total.", en: "Total relax.", zh: "放松身心。", ru: "Релакс." }, power: 38 },
+        { name: { es: "Porche Chillout", en: "Chillout Porch", zh: "休闲露台", ru: "Веранда" }, icon: "🛋️", desc: { es: "Sillones cómodos.", en: "Comfy sofas.", zh: "舒适沙发。", ru: "Уют." }, power: 30 },
+        { name: { es: "Cancha de Tenis", en: "Tennis Court", zh: "网球场", ru: "Теннисный корт" }, icon: "🎾", desc: { es: "Pista profesional.", en: "Pro court.", zh: "专业场地。", ru: "Корт." }, power: 45 },
+        { name: { es: "Cine al Aire Libre", en: "Outdoor Cinema", zh: "露天影院", ru: "Кинотеатр" }, icon: "🎬", desc: { es: "Pantalla gigante.", en: "Huge projector.", zh: "巨幕投影。", ru: "Проектор." }, power: 42 },
+        { name: { es: "Invernadero Botánico", en: "Greenhouse", zh: "温室花园", ru: "Теплица" }, icon: "🌿", desc: { es: "Plantas exóticas.", en: "Exotic plants.", zh: "珍稀植物。", ru: "Растения." }, power: 25 },
+        { name: { es: "Casa en el Árbol", en: "Treehouse", zh: "树屋", ru: "Домик на дереве" }, icon: "🌲", desc: { es: "Refugio infantil.", en: "Cozy hideout.", zh: "童趣树屋。", ru: "Укрытие." }, power: 28 },
+        { name: { es: "Cama Elástica", en: "Trampoline", zh: "蹦床", ru: "Батут" }, icon: "🤸", desc: { es: "Diversión sin fin.", en: "Endless jumping.", zh: "弹跳乐趣。", ru: "Прыжки." }, power: 20 },
+        { name: { es: "Fuente de Piedra", en: "Stone Fountain", zh: "石雕喷泉", ru: "Фонтан" }, icon: "⛲", desc: { es: "Sonido relajante.", en: "Water sound.", zh: "流水潺潺。", ru: "Вода." }, power: 22 },
+        { name: { es: "Huerto Ecológico", en: "Organic Garden", zh: "有机菜园", ru: "Огород" }, icon: "🍅", desc: { es: "Verduras frescas.", en: "Fresh veggies.", zh: "无公害蔬菜。", ru: "Овощи." }, power: 24 },
+        { name: { es: "Sauna Finlandesa", en: "Sauna", zh: "芬兰桑拿房", ru: "Сауна" }, icon: "🧖‍♂️", desc: { es: "Calor curativo.", en: "Pure wellness.", zh: "蒸气养生。", ru: "Пар." }, power: 36 },
+        { name: { es: "Hamacas Tropicales", en: "Hammocks", zh: "热带吊床", ru: "Гамаки" }, icon: "🌴", desc: { es: "Sombra de palmeras.", en: "Palm shadow.", zh: "棕榈夏日。", ru: "Отдых." }, power: 18 },
+        { name: { es: "Minigolf Privado", en: "Mini Golf", zh: "迷你高尔夫", ru: "Мини-гольф" }, icon: "⛳", desc: { es: "9 hoyos de diseño.", en: "9 fun holes.", zh: "趣味打靶。", ru: "Гольф." }, power: 32 },
+        { name: { es: "Zanja de Fuego Chill", en: "Fire Pit", zh: "篝火坑", ru: "Кострище" }, icon: "🔥", desc: { es: "Noches acogedoras.", en: "Cozy nights.", zh: "围炉夜话。", ru: "Огонь." }, power: 29 },
+        { name: { es: "Zona de Bar/Cocktail", en: "Outdoor Bar", zh: "户外酒吧", ru: "Бар" }, icon: "🍹", desc: { es: "Bebidas frías.", en: "Fresh cocktails.", zh: "特调饮品。", ru: "Напитки." }, power: 35 },
+        { name: { es: "Tirolesa de Jardín", en: "Zip Line", zh: "庭院滑索", ru: "Тарзанка" }, icon: "🪂", desc: { es: "Adrenalina rápida.", en: "Quick thrill.", zh: "穿梭飞跃。", ru: "Драйв." }, power: 31 },
+        { name: { es: "Robot Cortacésped", en: "Mower Bot", zh: "割草机器人", ru: "Робот-газонокосилка" }, icon: "🤖", desc: { es: "Jardín perfecto.", en: "Always clean.", zh: "自动打理。", ru: "Робот." }, power: 15 },
+        { name: { es: "Pista de Padel", en: "Padel Court", zh: "板网球场", ru: "Падел-корт" }, icon: "🎾", desc: { es: "Cristales y moqueta.", en: "Glass padel.", zh: "时尚运动。", ru: "Падел." }, power: 46 }
       ]
     },
     setup_gaming: {
       icon: "🎮", title: { es: "Habitación Gamer", en: "Gaming Room", zh: "电竞小屋", ru: "Геймерская" },
       items: [
-        { id: "g1", name: { es: "PC RTX 4090", en: "PC RTX 4090", zh: "顶级电脑", ru: "ПК RTX 4090" }, icon: "🖥️", desc: { es: "Máxima potencia.", en: "Max power.", zh: "性能怪兽", ru: "Макс. мощность" }, power: 50 },
-        { id: "g2", name: { es: "Monitor OLED 240Hz", en: "240Hz Monitor", zh: "240Hz显示器", ru: "Монитор 240Гц" }, icon: "📺", desc: { es: "Fluidez total.", en: "Ultra smooth.", zh: "极致丝滑", ru: "Плавность" }, power: 46 },
-        { id: "g3", name: { es: "Silla Ergonómica", en: "Ergonomic Chair", zh: "人体工学椅", ru: "Кресло" }, icon: "🪑", desc: { es: "Comodidad 24/7.", en: "Comfort 24/7.", zh: "久坐不累", ru: "Комфорт" }, power: 38 },
-        { id: "g4", name: { es: "Consola Next-Gen", en: "Next-Gen Console", zh: "次世代主机", ru: "Консоль" }, icon: "🎮", desc: { es: "Exclusivos top.", en: "Top exclusives.", zh: "独占大作", ru: "Игры" }, power: 36 },
-        { id: "g5", name: { es: "Luces RGB Neón", en: "RGB Lights", zh: "RGB氛围灯", ru: "RGB Подсветка" }, icon: "💡", desc: { es: "Estética 10/10.", en: "Aesthetic 10/10.", zh: "氛围感拉满", ru: "Стиль" }, power: 25 },
-        { id: "g6", name: { es: "Simulador de Carreras", en: "Racing Simulator", zh: "赛车模拟器", ru: "Симулятор гонок" }, icon: "🏎️", desc: { es: "Volante con Force Feedback.", en: "Force feedback wheel.", zh: "拟真驾驭", ru: "Руль" }, power: 48 },
-        { id: "g7", name: { es: "Gafas VR Ultrawide", en: "Ultrawide VR", zh: "VR头显", ru: "VR шлем" }, icon: "🥽", desc: { es: "Inmersión 360 grados.", en: "Full immersion.", zh: "沉浸世界", ru: "Виртуальность" }, power: 44 },
-        { id: "g8", name: { es: "Teclado Custom Lubed", en: "Custom Keyboard", zh: "客制化机械键盘", ru: "Механическая клавиатура" }, icon: "⌨️", desc: { es: "Sonido y tacto perfecto.", en: "Perfect sound.", zh: "极致手感", ru: "Клавиатура" }, power: 32 },
-        { id: "g9", name: { es: "Ratón Ultra Ligero", en: "Ultra Light Mouse", zh: "轻量化鼠标", ru: "Легкая мышь" }, icon: "🖱️", desc: { es: "Sensor óptico de 30k DPI.", en: "30k DPI sensor.", zh: "指哪打哪", ru: "Мышка" }, power: 30 },
-        { id: "g10", name: { es: "Auriculares Studio DAC", en: "Studio Headphones", zh: "Hi-Fi耳机", ru: "Студийные наушники" }, icon: "🎧", desc: { es: "Audio posicional 7.1.", en: "Spatial audio.", zh: "听音辨位", ru: "Звук" }, power: 37 },
-        { id: "g11", name: { es: "Nevera de Bebidas RedBull", en: "Mini RedBull Fridge", zh: "迷你饮料柜", ru: "Мини-холодильник" }, icon: "🥤", desc: { es: "Energía siempre a mano.", en: "Cold drinks.", zh: "冰镇能量", ru: "Напитки" }, power: 24 },
-        { id: "g12", name: { es: "Mesa Elevable Eléctrica", en: "Standing Desk", zh: "电动升降桌", ru: "Стол с регулировкой" }, icon: "🛏️", desc: { es: "Juega de pie o sentado.", en: "Ergonomic desk.", zh: "健康电竞", ru: "Стол" }, power: 35 },
-        { id: "g13", name: { es: "Micrófono de Condensador", en: "Condenser Mic", zh: "电容麦克风", ru: "Микрофон" }, icon: "🎙️", desc: { es: "Voz limpia sin ruido.", en: "Clean voice.", zh: "高清拾音", ru: "Голос" }, power: 33 },
-        { id: "g14", name: { es: "Capturadora 4K60", en: "4K Capture Card", zh: "4K采集卡", ru: "Карта захвата" }, icon: "📼", desc: { es: "Transmisión sin lag.", en: "Zero lag streaming.", zh: "无损采集", ru: "Захват" }, power: 29 },
-        { id: "g15", name: { es: "Soundpanel Acústico", en: "Acoustic Panels", zh: "吸音板", ru: "Акустические панели" }, icon: "🧱", desc: { es: "Cero eco en habitación.", en: "No room echo.", zh: "隔音降噪", ru: "Акустика" }, power: 20 },
-        { id: "g16", name: { es: "Arcade Stick Arcade", en: "Fightstick", zh: "街机摇杆", ru: "Аркадный стик" }, icon: "🕹️", desc: { es: "Para juegos de lucha.", en: "For fighting games.", zh: "格斗神器", ru: "Джойстик" }, power: 28 },
-        { id: "g17", name: { es: "Consola Portátil OLED", en: "Handheld Console", zh: "掌上游戏机", ru: "Портативка" }, icon: "📱", desc: { es: "Juega en la cama.", en: "Play anywhere.", zh: "随时随地", ru: "Портатив" }, power: 34 },
-        { id: "g18", name: { es: "Alfombrilla XXL Térmica", en: "XXL Deskmat", zh: "超大桌垫", ru: "Коврик XXL" }, icon: "🖼️", desc: { es: "Cubre todo el escritorio.", en: "Full desk cover.", zh: "超大面积", ru: "Коврик" }, power: 19 },
-        { id: "g19", name: { es: "Brazo de Monitor Triplo", en: "Triple Monitor Arm", zh: "三屏支架", ru: "Кронштейн" }, icon: "🏗️", desc: { es: "PANTALLAS flotantes.", en: "Floating monitors.", zh: "多屏联动", ru: "Кронштейн" }, power: 31 },
-        { id: "g20", name: { es: "Figura Coleccionable 1/1", en: "Life-size Statue", zh: "1:1等身雕像", ru: "Статуя 1:1" }, icon: "🗿", desc: { es: "Edición ultralimitada.", en: "1/1 Scale statue.", zh: "信仰镇宅", ru: "Коллекционка" }, power: 39 }
+        { name: { es: "PC RTX 4090", en: "PC RTX 4090", zh: "顶级电脑", ru: "ПК RTX 4090" }, icon: "🖥️", desc: { es: "Máxima potencia.", en: "Max power.", zh: "性能怪兽。", ru: "Мощность." }, power: 50 },
+        { name: { es: "Monitor OLED 240Hz", en: "240Hz Monitor", zh: "240Hz显示器", ru: "Монитор 240Гц" }, icon: "📺", desc: { es: "Fluidez total.", en: "Ultra smooth.", zh: "极致丝滑。", ru: "Плавность." }, power: 46 },
+        { name: { es: "Silla Ergonómica", en: "Ergonomic Chair", zh: "人体工学椅", ru: "Кресло" }, icon: "🪑", desc: { es: "Comodidad 24/7.", en: "Comfort 24/7.", zh: "久坐不累。", ru: "Комфорт." }, power: 38 },
+        { name: { es: "Consola Next-Gen", en: "Next-Gen Console", zh: "次世代主机", ru: "Консоль" }, icon: "🎮", desc: { es: "Exclusivos top.", en: "Top exclusives.", zh: "独占大作。", ru: "Игры." }, power: 36 },
+        { name: { es: "Luces RGB Neón", en: "RGB Lights", zh: "RGB氛围灯", ru: "RGB Подсветка" }, icon: "💡", desc: { es: "Estética 10/10.", en: "Aesthetic 10/10.", zh: "氛围感拉满。", ru: "Стиль." }, power: 25 },
+        { name: { es: "Volante Simracing", en: "Sim Wheel", zh: "赛车模拟器", ru: "Руль Simracing" }, icon: "🏎️", desc: { es: "Force feedback.", en: "Real driving.", zh: "拟真驾驶。", ru: "Симулятор." }, power: 42 },
+        { name: { es: "Gafas VR Ultima Gen", en: "VR Headset", zh: "VR头显", ru: "VR Шлем" }, icon: "🥽", desc: { es: "Inmersión total.", en: "Full immersion.", zh: "沉浸世界。", ru: "ВР." }, power: 40 },
+        { name: { es: "Guitarras Arcade", en: "Arcade Guitar", zh: "吉他英雄控制器", ru: "Гитара Arcade" }, icon: "🎸", desc: { es: "Modo ritmo.", en: "Rhythm game.", zh: "音乐摇滚。", ru: "摇滚." }, power: 22 },
+        { name: { es: "Teclado Custom Switch", en: "Custom Keyboard", zh: "客制化机械键盘", ru: "Механическая клавиатура" }, icon: "⌨️", desc: { es: "Sonido perfecto.", en: "Creamy sound.", zh: "手感拉满。", ru: "Клавиатура." }, power: 28 },
+        { name: { es: "Auriculares 7.1", en: "7.1 Headset", zh: "7.1声道耳机", ru: "Наушники 7.1" }, icon: "🎧", desc: { es: "Audio espacial.", en: "Spatial audio.", zh: "听声辨位。", ru: "Звук." }, power: 32 },
+        { name: { es: "Mesa Elevable", en: "Standing Desk", zh: "电动升降桌", ru: "Стол с регулировкой" }, icon: "🛋️", desc: { es: "Motor dual.", en: "Dual motor.", zh: "健康电竞。", ru: "Стол." }, power: 30 },
+        { name: { es: "Minibar Gamer", en: "Fridge", zh: "迷你冰柜", ru: "Мини-холодильник" }, icon: "🥤", desc: { es: "Bebidas frías.", en: "Cold drinks.", zh: "冰镇饮料。", ru: "Напитки." }, power: 20 },
+        { name: { es: "Panel Insonorizante", en: "Acoustic Panels", zh: "隔音吸音板", ru: "Акустические панели" }, icon: "🧱", desc: { es: "Cero eco.", en: "No eco.", zh: "专业隔音。", ru: "Тишина." }, power: 18 },
+        { name: { es: "Colección Figuras", en: "Figures", zh: "手办展示柜", ru: "Фигурки" }, icon: "🧸", desc: { es: "Anime & Games.", en: "Edición limitada.", zh: "限定收藏。", ru: "Коллекция." }, power: 27 },
+        { name: { es: "Ratón Ultra-Light", en: "Pro Mouse", zh: "超轻量鼠标", ru: "Мышь Ultralight" }, icon: "🖱️", desc: { es: "49g sensor top.", en: "Pro aiming.", zh: "电竞拉满。", ru: "Аим." }, power: 26 },
+        { name: { es: "Capturadora 4K", en: "4K Capture Card", zh: "4K采集卡", ru: "Карта захвата 4K" }, icon: "📹", desc: { es: "Streaming 60fps.", en: "Pro stream.", zh: "高清直播。", ru: "Стриминг." }, power: 24 },
+        { name: { es: "Micrófono Estudio", en: "Studio Mic", zh: "录音棚麦克风", ru: "Студийный микрофон" }, icon: "🎙️", desc: { es: "Voz de locutor.", en: "Broadcast quality.", zh: "纯净嗓音。", ru: "Микрофон." }, power: 29 },
+        { name: { es: "Brazo Hidráulico Monitor", en: "Monitor Arm", zh: "液压显示器支架", ru: "Кронштейн для монитора" }, icon: "🦾", desc: { es: "Cero cables.", en: "Clean desk.", zh: "桌面整洁。", ru: "Кронштейн." }, power: 19 },
+        { name: { es: "Stream Deck 32 Keys", en: "Stream Deck", zh: "快捷控制台", ru: "Контроллер Stream Deck" }, icon: "🎛️", desc: { es: "Atajos macros.", en: "One touch control.", zh: "一键宏控。", ru: "Макросы." }, power: 23 },
+        { name: { es: "Máquina de Arcade Retró", en: "Arcade Cabinet", zh: "复古街机", ru: "Аркадный автомат" }, icon: "🕹️", desc: { es: "Nostalgia pura.", en: "Pure nostalgia.", zh: "经典情怀。", ru: "Ретро." }, power: 35 }
+      ]
+    },
+    videojuegos_top: {
+      icon: "🕹️", title: { es: "Juegos Incomprendidos & Joyas", en: "Underrated Game Gems", zh: "神作与被低估的掌珠", ru: "Недооцененные шедевры" },
+      items: [
+        { name: { es: "Titanfall 2", en: "Titanfall 2", zh: "泰坦陨落 2", ru: "Titanfall 2" }, icon: "🤖", desc: { es: "Movimiento fluido, titanes y una de las mejores campañas.", en: "Peak FPS movement, Titans, and iconic campaign.", zh: "极致身法，泰坦协同，顶级单人战役。", ru: "Шедевральный паркур, титаны и культовая кампания." }, power: 48 },
+        { name: { es: "Prey (2017)", en: "Prey (2017)", zh: "掠食 (2017)", ru: "Prey (2017)" }, icon: "👁️", desc: { es: "Simulador inmersivo sublime en la estación Talos I.", en: "Sublime immersive sim set on Talos I.", zh: "Talos I 空间站上的极致沉浸式模拟神作。", ru: "Имерсив-сим высшего класса на станции Talos I." }, power: 47 },
+        { name: { es: "Bulletstorm", en: "Bulletstorm", zh: "子弹风暴", ru: "Bulletstorm" }, icon: "⚡", desc: { es: "Puntuación por bajas creativas, látigo de energía y frenetismo.", en: "Skillshots, energy leash, pure over-the-top fun.", zh: "创意技能击杀、能量鞭与极致爽快体验。", ru: "Креативные убийства, хлыст y безудержный драйв." }, power: 41 },
+        { name: { es: "The Wonderful 101", en: "The Wonderful 101", zh: "神奇101", ru: "The Wonderful 101" }, icon: "🦸", desc: { es: "Acción masiva, héroes unidos y mecánicas únicas.", en: "Massive superhero action with unique Unite Morph mechanics.", zh: "百人英雄统合、合体变身与独特的动作机制。", ru: "Массовый экшен, объединение героев y уникальная механика." }, power: 40 },
+        { name: { es: "Beyond Good & Evil", en: "Beyond Good & Evil", zh: "超越善恶", ru: "Beyond Good & Evil" }, icon: "📸", desc: { es: "Periodismo, conspiraciones alienígenas y un mundo inolvidable.", en: "Journalism, alien conspiracies, and unforgettable world.", zh: "揭露阴谋的查案之旅、独特摄影与经典奇幻世界。", ru: "Журналистика, инопланетный заговор y незабываемый мир." }, power: 43 },
+        { name: { es: "Deadly Premonition", en: "Deadly Premonition", zh: "致命预感", ru: "Deadly Premonition" }, icon: "☕", desc: { es: "Obra de culto, misterio surrealista y café premonitorio.", en: "Cult classic, surreal mystery, and premonition coffee.", zh: "邪典经典、超现实悬疑案与神奇的咖啡预言。", ru: "Культовая классика, сюрреалистичный детектив y кофе." }, power: 39 },
+        { name: { es: "Sunset Overdrive", en: "Sunset Overdrive", zh: "日落过载", ru: "Sunset Overdrive" }, icon: "💥", desc: { es: "Color, acrobacias con railes, armas locas y diversión pura.", en: "Vibrant apocalyptic playground with rail-grinding.", zh: "色彩斑斓的废土 Playground、高空滑行与无厘头武器。", ru: "Яркий апокалипсис, скольжение по рельсам y сумасшедшее оружие." }, power: 42 },
+        { name: { es: "Psychonauts", en: "Psychonauts", zh: "脑航员", ru: "Psychonauts" }, icon: "🧠", desc: { es: "Viaje alucinante a través de las mentes humanas.", en: "A mind-bending journey into human psyches.", zh: "踏入人类内心深处世界的脑洞大开之旅。", ru: "Умопомрачительное путешествие по человеческому разуму." }, power: 45 },
+        { name: { es: "Vanquish", en: "Vanquish", zh: "征服", ru: "Vanquish" }, icon: "🚀", desc: { es: "Deslizamiento a reacción, tiempo bala y tiroteos desenfrenados.", en: "Rocket-sliding, bullet time, and hyper-fast TPS gameplay.", zh: "喷射滑行、子射时间与极致高速射击体验。", ru: "Реактивное скольжение, замедление времени y безумный темп." }, power: 44 },
+        { name: { es: "Alpha Protocol", en: "Alpha Protocol", zh: "阿尔法协议", ru: "Alpha Protocol" }, icon: "🕵️", desc: { es: "RPG de espionaje con ramificaciones de decisiones reales.", en: "Espionage RPG where your choices genuinely matter.", zh: "真正的谍报 RPG，抉择与分支极其丰富的沉浸体验。", ru: "Шпионский RPG с реальным влиянием выборов на сюжет." }, power: 40 }
       ]
     }
   };
 
-  let gameMode = '2p';
-  let botDifficulty = 'novice'; 
-  let selectedCategoryKey = 'tridente_futbol';
-  
-  let usedItemIds = new Set();
-  let availablePool = [];
-  
+  let gameMode = '2p'; // '2p' or 'bot'
+  let botDifficulty = 'novice'; // 'novice', 'medium', 'expert'
+  let currentCategoryKey = null;
+  let activePool = [];
+  let currentItem = null;
+  let currentBid = 0;
+  let currentBidder = 0; // 0: Nobody, 1: P1, 2: P2/Bot
+  let activeTurn = 1; // 1: P1, 2: P2/Bot
+  let p1Passed = false;
+  let p2Passed = false;
+
   let p1 = { money: 20, inventory: [] };
   let p2 = { money: 20, inventory: [] };
-  
-  let currentBid = 0;
-  let highestBidder = 0; 
-  let activeTurn = 1; 
-  let activeItem = null;
-  let isSpinning = false;
-  let totalBidsThisItem = 0;
 
-  window.onload = () => { changeLanguage('es'); };
+  function setLanguageText() {
+    const txt = I18N[currentLang];
+    document.getElementById('txt-subtitle').innerText = txt.subtitle;
+    document.getElementById('txt-back').innerText = txt.back;
+    document.getElementById('txt-step1').innerText = txt.step1;
+    document.getElementById('txt-mode-2p').innerText = txt.mode2p;
+    document.getElementById('txt-mode-bot').innerText = txt.modeBot;
+    document.getElementById('txt-diff-label').innerText = txt.diffLabel;
+    document.getElementById('txt-diff-novice').innerText = txt.diffNovice;
+    document.getElementById('txt-diff-medium').innerText = txt.diffMedium;
+    document.getElementById('txt-diff-expert').innerText = txt.diffExpert;
+    document.getElementById('txt-step2').innerText = txt.step2;
+    document.getElementById('txt-current-bid').innerText = txt.currentBid;
+    document.getElementById('txt-bidder-label').innerText = txt.bidderLabel;
+    document.getElementById('txt-pass-p1').innerText = txt.pass;
+    document.getElementById('txt-pass-p2').innerText = txt.pass;
+    document.getElementById('txt-inv-p1').innerText = txt.yourItems;
+    document.getElementById('txt-inv-p2').innerText = (gameMode === 'bot') ? txt.theirItems : txt.theirItems;
+    document.getElementById('txt-play-again').innerText = txt.playAgain;
+    
+    document.getElementById('p1-title').innerText = txt.p1;
+    document.getElementById('p2-title').innerText = (gameMode === 'bot') ? txt.bot : txt.p2;
+    document.getElementById('res-p1-title').innerText = txt.p1;
+    document.getElementById('res-p2-title').innerText = (gameMode === 'bot') ? txt.bot : txt.p2;
+
+    renderCategories();
+  }
 
   function changeLanguage(lang) {
     currentLang = lang;
     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`lang-${lang}`).classList.add('active');
+    setLanguageText();
+    if (currentItem) {
+      updateItemDisplayUI();
+      updateBidStatusUI();
+    }
+  }
 
-    const t = I18N[lang];
-    document.getElementById('txt-subtitle').innerText = t.subtitle;
-    document.getElementById('txt-back').innerText = t.back;
-    document.getElementById('txt-step1').innerText = t.step1;
-    document.getElementById('txt-mode-2p').innerText = t.mode2p;
-    document.getElementById('txt-mode-bot').innerText = t.modeBot;
-    document.getElementById('txt-diff-label').innerText = t.diffLabel;
-    document.getElementById('txt-diff-novice').innerText = t.diffNovice;
-    document.getElementById('txt-diff-medium').innerText = t.diffMedium;
-    document.getElementById('txt-diff-expert').innerText = t.diffExpert;
-    document.getElementById('txt-step2').innerText = t.step2;
-    document.getElementById('txt-current-bid').innerText = t.currentBid;
-    document.getElementById('txt-bidder-label').innerText = t.bidderLabel;
-    document.getElementById('txt-pass-p1').innerText = t.pass;
-    document.getElementById('txt-pass-p2').innerText = t.pass;
-    document.getElementById('txt-inv-p1').innerText = t.yourItems;
-    document.getElementById('txt-inv-p2').innerText = t.theirItems;
-    document.getElementById('txt-play-again').innerText = t.playAgain;
-
-    document.getElementById('p1-title').innerText = t.p1;
-    document.getElementById('res-p1-title').innerText = t.p1;
-    document.getElementById('p2-title').innerText = gameMode === 'bot' ? t.bot : t.p2;
-    document.getElementById('res-p2-title').innerText = gameMode === 'bot' ? t.bot : t.p2;
-
-    renderCategorySelection();
-    updateUI();
+  function renderCategories() {
+    const grid = document.getElementById('categories-grid');
+    grid.innerHTML = '';
+    for (let key in CATEGORIES_DATA) {
+      const cat = CATEGORIES_DATA[key];
+      const card = document.createElement('div');
+      card.className = 'cat-card';
+      card.onclick = () => startGame(key);
+      card.innerHTML = `
+        <div class="cat-icon">${cat.icon}</div>
+        <div style="font-weight: bold; font-size: 1.1rem; color: #f59e0b;">${cat.title[currentLang] || cat.title.es}</div>
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">${cat.items.length} objetos disponibles</div>
+      `;
+      grid.appendChild(card);
+    }
   }
 
   function selectMode(mode) {
     gameMode = mode;
     document.getElementById('btn-mode-2p').classList.toggle('selected', mode === '2p');
     document.getElementById('btn-mode-bot').classList.toggle('selected', mode === 'bot');
-    document.getElementById('bot-difficulty-container').style.display = mode === 'bot' ? 'block' : 'none';
-    changeLanguage(currentLang);
+    document.getElementById('bot-difficulty-container').style.display = (mode === 'bot') ? 'block' : 'none';
+    document.getElementById('p2-title').innerText = (mode === 'bot') ? I18N[currentLang].bot : I18N[currentLang].p2;
   }
 
   function selectDifficulty(diff) {
@@ -415,54 +473,6 @@
     document.getElementById('diff-expert').classList.toggle('selected', diff === 'expert');
   }
 
-  function renderCategorySelection() {
-    const grid = document.getElementById('categories-grid');
-    grid.innerHTML = '';
-    
-    for (let key in CATEGORIES_DATA) {
-      const cat = CATEGORIES_DATA[key];
-      const card = document.createElement('div');
-      card.className = 'cat-card';
-      card.onclick = () => startGame(key);
-      card.innerHTML = `
-        <div class="cat-icon">${cat.icon}</div>
-        <div style="font-weight: bold; font-size: 1.1rem; color: #f59e0b;">${cat.title[currentLang]}</div>
-        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">${cat.items.length} objetos disponibles</div>
-      `;
-      grid.appendChild(card);
-    }
-  }
-
-  function startGame(catKey) {
-    selectedCategoryKey = catKey;
-    const cat = CATEGORIES_DATA[catKey];
-
-    let unusedItems = cat.items.filter(item => !usedItemIds.has(item.id));
-    
-    if (unusedItems.length < 8) {
-      cat.items.forEach(item => usedItemIds.delete(item.id));
-      unusedItems = [...cat.items];
-    }
-
-    unusedItems.sort(() => Math.random() - 0.5);
-    
-    // SELECCIONAR EXACTAMENTE 8 OBJETOS PARA LA PARTIDA (4 para cada jugador)
-    availablePool = unusedItems.slice(0, 8);
-    availablePool.forEach(item => usedItemIds.add(item.id));
-
-    p1 = { money: 20, inventory: [] };
-    p2 = { money: 20, inventory: [] };
-
-    document.getElementById('menu-screen').style.display = 'none';
-    document.getElementById('auction-screen').style.display = 'block';
-    document.getElementById('results-screen').style.display = 'none';
-    document.getElementById('nav-back-btn').style.display = 'inline-flex';
-
-    document.getElementById('auction-category-title').innerText = `${cat.icon} ${cat.title[currentLang]}`;
-
-    nextAuctionItem();
-  }
-
   function goToMenu() {
     document.getElementById('menu-screen').style.display = 'block';
     document.getElementById('auction-screen').style.display = 'none';
@@ -470,190 +480,85 @@
     document.getElementById('nav-back-btn').style.display = 'none';
   }
 
-  function nextAuctionItem() {
-    // Si ambos ya tienen 4 objetos o se acaba el pool, termina la partida
-    if ((p1.inventory.length >= 4 && p2.inventory.length >= 4) || availablePool.length === 0) {
-      handleRemainingGifts();
+  function startGame(catKey) {
+    currentCategoryKey = catKey;
+    const cat = CATEGORIES_DATA[catKey];
+    
+    // Clonar y mezclar los objetos
+    activePool = [...cat.items].sort(() => Math.random() - 0.5);
+
+    p1 = { money: 20, inventory: [] };
+    p2 = { money: 20, inventory: [] };
+
+    document.getElementById('menu-screen').style.display = 'none';
+    document.getElementById('results-screen').style.display = 'none';
+    document.getElementById('auction-screen').style.display = 'block';
+    document.getElementById('nav-back-btn').style.display = 'inline-flex';
+
+    document.getElementById('auction-category-title').innerText = `${cat.icon} ${cat.title[currentLang] || cat.title.es}`;
+    
+    updateWalletsAndInventories();
+    startNextItemAuction();
+  }
+
+  function startNextItemAuction() {
+    // Condición de fin de juego: alguien llegó a 4 objetos o se acabaron los objetos
+    if (p1.inventory.length >= 4 || p2.inventory.length >= 4 || activePool.length === 0) {
       endGame();
       return;
     }
 
-    // Si un jugador ya llenó su cupo de 4, los objetos restantes se le otorgan al otro
-    if (p1.inventory.length >= 4 || p2.inventory.length >= 4) {
-      handleRemainingGifts();
-      endGame();
-      return;
-    }
-
-    activeItem = availablePool.shift();
     currentBid = 0;
-    highestBidder = 0;
-    activeTurn = 1;
-    totalBidsThisItem = 0;
+    currentBidder = 0;
+    p1Passed = false;
+    p2Passed = false;
 
-    const currentItemNum = (p1.inventory.length + p2.inventory.length) + 1;
-    document.getElementById('items-left-count').innerText = `Objeto ${currentItemNum} de 8`;
+    // Alternar quién empieza la subasta
+    activeTurn = ((p1.inventory.length + p2.inventory.length) % 2 === 0) ? 1 : 2;
 
-    isSpinning = true;
-    updateUI();
-    
     const displayBox = document.getElementById('item-display-box');
+    displayBox.classList.add('roulette-spin');
+    document.getElementById('item-icon').innerText = "🎲";
+    document.getElementById('item-name').innerText = I18N[currentLang].spinning;
+    document.getElementById('item-desc').innerText = I18N[currentLang].spinningDesc;
     
-    let spinCount = 0;
-    const cat = CATEGORIES_DATA[selectedCategoryKey];
-    
-    const interval = setInterval(() => {
-      const randomItem = cat.items[Math.floor(Math.random() * cat.items.length)];
-      document.getElementById('item-icon').innerText = randomItem.icon;
-      document.getElementById('item-name').innerText = randomItem.name[currentLang];
-      document.getElementById('item-desc').innerText = I18N[currentLang].spinningDesc;
-      spinCount++;
+    disableAllControls();
 
-      if (spinCount > 8) {
-        clearInterval(interval);
-        
-        document.getElementById('item-icon').innerText = activeItem.icon;
-        document.getElementById('item-name').innerText = activeItem.name[currentLang];
-        document.getElementById('item-desc').innerText = activeItem.desc[currentLang];
-        
-        isSpinning = false;
-        updateUI();
-      }
-    }, 100);
+    setTimeout(() => {
+      displayBox.classList.remove('roulette-spin');
+      currentItem = activePool.pop();
+      
+      const totalRounds = 8;
+      const currentRoundNum = (p1.inventory.length + p2.inventory.length) + 1;
+      document.getElementById('items-left-count').innerText = `Objeto ${currentRoundNum} de ${totalRounds}`;
+
+      updateItemDisplayUI();
+      updateBidStatusUI();
+      updateTurnUI();
+      
+      checkBotTurn();
+    }, 1000);
   }
 
-  function handleRemainingGifts() {
-    if (p1.inventory.length >= 4 && p2.inventory.length < 4) {
-      while (p2.inventory.length < 4 && availablePool.length > 0) {
-        let gifted = availablePool.shift();
-        gifted.isGifted = true;
-        p2.inventory.push(gifted);
-      }
-    } else if (p2.inventory.length >= 4 && p1.inventory.length < 4) {
-      while (p1.inventory.length < 4 && availablePool.length > 0) {
-        let gifted = availablePool.shift();
-        gifted.isGifted = true;
-        p1.inventory.push(gifted);
-      }
-    }
+  function updateItemDisplayUI() {
+    if (!currentItem) return;
+    document.getElementById('item-icon').innerText = currentItem.icon;
+    document.getElementById('item-name').innerText = currentItem.name[currentLang] || currentItem.name.es;
+    document.getElementById('item-desc').innerText = currentItem.desc[currentLang] || currentItem.desc.es;
   }
 
-  function playerBid(playerNum, increment) {
-    if (isSpinning) return;
-    
-    const newBid = currentBid + increment;
-    const playerWallet = playerNum === 1 ? p1.money : p2.money;
-
-    if (newBid > playerWallet) return;
-
-    currentBid = newBid;
-    highestBidder = playerNum;
-    totalBidsThisItem++;
-
-    activeTurn = playerNum === 1 ? 2 : 1;
-    updateUI();
-
-    if (gameMode === 'bot' && activeTurn === 2) {
-      setTimeout(botTurn, 1000);
-    }
+  function updateBidStatusUI() {
+    document.getElementById('current-bid-amount').innerText = `${currentBid} €`;
+    const bidderText = currentBidder === 0 ? I18N[currentLang].nobody : (currentBidder === 1 ? I18N[currentLang].p1 : (gameMode === 'bot' ? I18N[currentLang].bot : I18N[currentLang].p2));
+    document.getElementById('current-bidder-name').innerText = bidderText;
   }
 
-  function playerPass(playerNum) {
-    if (isSpinning) return;
-
-    if (highestBidder !== 0 && highestBidder !== playerNum) {
-      awardItem(highestBidder);
-    } else if (highestBidder === 0) {
-      if (playerNum === 1) {
-        activeTurn = 2;
-        updateUI();
-        if (gameMode === 'bot') setTimeout(botTurn, 1000);
-      } else {
-        nextAuctionItem();
-      }
-    }
-  }
-
-  function botTurn() {
-    if (isSpinning || activeTurn !== 2) return;
-
-    const botMoney = p2.money;
-    const itemPower = activeItem.power;
-
-    let shouldBid = false;
-    let bidAdd = 1;
-
-    if (botDifficulty === 'novice') {
-      shouldBid = Math.random() > 0.4 && (currentBid + 1 <= botMoney) && currentBid < 8;
-    } else if (botDifficulty === 'medium') {
-      const maxVal = Math.floor(itemPower / 4);
-      shouldBid = currentBid < maxVal && (currentBid + 1 <= botMoney);
-    } else {
-      const maxVal = Math.floor(itemPower / 3);
-      if (currentBid < maxVal && (currentBid + 2 <= botMoney) && Math.random() > 0.3) {
-        shouldBid = true;
-        bidAdd = 2;
-      } else if (currentBid < maxVal && (currentBid + 1 <= botMoney)) {
-        shouldBid = true;
-        bidAdd = 1;
-      }
-    }
-
-    if (shouldBid) {
-      playerBid(2, bidAdd);
-    } else {
-      playerPass(2);
-    }
-  }
-
-  function awardItem(winnerNum) {
-    if (winnerNum === 1) {
-      p1.money -= currentBid;
-      p1.inventory.push(activeItem);
-    } else {
-      p2.money -= currentBid;
-      p2.inventory.push(activeItem);
-    }
-
-    nextAuctionItem();
-  }
-
-  function updateUI() {
+  function updateWalletsAndInventories() {
     document.getElementById('p1-money').innerText = p1.money;
     document.getElementById('p2-money').innerText = p2.money;
+
     document.getElementById('p1-count').innerText = p1.inventory.length;
     document.getElementById('p2-count').innerText = p2.inventory.length;
-
-    document.getElementById('current-bid-amount').innerText = `${currentBid} €`;
-    
-    const t = I18N[currentLang];
-    if (highestBidder === 0) {
-      document.getElementById('current-bidder-name').innerText = t.nobody;
-    } else if (highestBidder === 1) {
-      document.getElementById('current-bidder-name').innerText = t.p1;
-    } else {
-      document.getElementById('current-bidder-name').innerText = gameMode === 'bot' ? t.bot : t.p2;
-    }
-
-    const banner = document.getElementById('turn-banner');
-    if (activeTurn === 1) {
-      banner.innerText = t.turnP1;
-      banner.className = "turn-indicator p1-turn";
-    } else {
-      banner.innerText = gameMode === 'bot' ? t.turnBot : t.turnP2;
-      banner.className = "turn-indicator p2-turn";
-    }
-
-    const p1Disabled = isSpinning || activeTurn !== 1 || p1.inventory.length >= 4;
-    const p2Disabled = isSpinning || activeTurn !== 2 || gameMode === 'bot' || p2.inventory.length >= 4;
-
-    document.getElementById('p1-btn-1').disabled = p1Disabled || (currentBid + 1 > p1.money);
-    document.getElementById('p1-btn-2').disabled = p1Disabled || (currentBid + 2 > p1.money);
-    document.getElementById('p1-btn-pass').disabled = p1Disabled;
-
-    document.getElementById('p2-btn-1').disabled = p2Disabled || (currentBid + 1 > p2.money);
-    document.getElementById('p2-btn-2').disabled = p2Disabled || (currentBid + 2 > p2.money);
-    document.getElementById('p2-btn-pass').disabled = p2Disabled;
 
     renderInventory('p1-inventory', p1.inventory);
     renderInventory('p2-inventory', p2.inventory);
@@ -664,66 +569,234 @@
     container.innerHTML = '';
     items.forEach(item => {
       const div = document.createElement('div');
-      div.className = 'inv-item';
-      div.innerHTML = `${item.icon} <strong>${item.name[currentLang]}</strong> ${item.isGifted ? '<span class="gift-tag">🎁 Regalo</span>' : ''}`;
+      div.className = `inv-item ${item.gifted ? 'gifted' : ''}`;
+      div.innerHTML = `<span>${item.icon}</span> <strong>${item.name[currentLang] || item.name.es}</strong>`;
       container.appendChild(div);
     });
   }
 
+  function disableAllControls() {
+    document.querySelectorAll('.controls button').forEach(btn => btn.disabled = true);
+  }
+
+  function updateTurnUI() {
+    const banner = document.getElementById('turn-banner');
+    banner.classList.remove('p1-turn', 'p2-turn');
+
+    if (activeTurn === 1) {
+      banner.classList.add('p1-turn');
+      banner.innerText = I18N[currentLang].turnP1;
+      document.getElementById('p1-box').classList.remove('disabled');
+      document.getElementById('p2-box').classList.add('disabled');
+    } else {
+      banner.classList.add('p2-turn');
+      banner.innerText = (gameMode === 'bot') ? I18N[currentLang].turnBot : I18N[currentLang].turnP2;
+      document.getElementById('p2-box').classList.remove('disabled');
+      document.getElementById('p1-box').classList.add('disabled');
+    }
+
+    // Activar botones según turno
+    document.getElementById('p1-btn-1').disabled = !(activeTurn === 1 && !p1Passed && p1.money >= currentBid + 1);
+    document.getElementById('p1-btn-2').disabled = !(activeTurn === 1 && !p1Passed && p1.money >= currentBid + 2);
+    document.getElementById('p1-btn-pass').disabled = !(activeTurn === 1 && !p1Passed);
+
+    const isBotTurn = (gameMode === 'bot' && activeTurn === 2);
+    document.getElementById('p2-btn-1').disabled = isBotTurn || !(activeTurn === 2 && !p2Passed && p2.money >= currentBid + 1);
+    document.getElementById('p2-btn-2').disabled = isBotTurn || !(activeTurn === 2 && !p2Passed && p2.money >= currentBid + 2);
+    document.getElementById('p2-btn-pass').disabled = isBotTurn || !(activeTurn === 2 && !p2Passed);
+  }
+
+  function playerBid(playerNum, increment) {
+    const newBid = currentBid + increment;
+    const playerMoney = (playerNum === 1) ? p1.money : p2.money;
+
+    if (playerMoney >= newBid) {
+      currentBid = newBid;
+      currentBidder = playerNum;
+      updateBidStatusUI();
+      switchTurn();
+    }
+  }
+
+  function playerPass(playerNum) {
+    if (playerNum === 1) p1Passed = true;
+    if (playerNum === 2) p2Passed = true;
+
+    // Si ambos han pasado sin pujar, el objeto se descarta
+    if (p1Passed && p2Passed && currentBidder === 0) {
+      setTimeout(() => startNextItemAuction(), 800);
+      return;
+    }
+
+    // Si un jugador pasa y el otro ya pujó, la subasta de este objeto termina
+    if ((p1Passed || p2Passed) && currentBidder !== 0) {
+      resolveAuction();
+      return;
+    }
+
+    switchTurn();
+  }
+
+  function switchTurn() {
+    activeTurn = (activeTurn === 1) ? 2 : 1;
+
+    // Si el siguiente ya ha pasado, vuelve al otro
+    if (activeTurn === 1 && p1Passed) activeTurn = 2;
+    if (activeTurn === 2 && p2Passed) activeTurn = 1;
+
+    updateTurnUI();
+    checkBotTurn();
+  }
+
+  function checkBotTurn() {
+    if (gameMode === 'bot' && activeTurn === 2 && !p2Passed) {
+      disableAllControls();
+      setTimeout(makeBotDecision, 1000);
+    }
+  }
+
+  function makeBotDecision() {
+    if (!currentItem) return;
+
+    const itemPower = currentItem.power || 30;
+    const botMoney = p2.money;
+    let shouldBid = false;
+    let bidAmount = 1;
+
+    if (botDifficulty === 'novice') {
+      // Bot novato: Pujas aleatorias y simples
+      if (currentBid < 5 && botMoney > currentBid + 1 && Math.random() > 0.3) {
+        shouldBid = true;
+        bidAmount = Math.random() > 0.5 ? 1 : 2;
+      }
+    } else if (botDifficulty === 'medium') {
+      // Bot medio: Valora si el poder del objeto compensa el coste
+      const maxTargetBid = Math.floor(itemPower / 8);
+      if (currentBid < maxTargetBid && botMoney >= currentBid + 1) {
+        shouldBid = true;
+        bidAmount = (currentBid + 2 <= maxTargetBid && Math.random() > 0.5) ? 2 : 1;
+      }
+    } else {
+      // Bot experto: Estratégico, no gasta en objetos débiles, agresivo en legendarios
+      const maxTargetBid = Math.floor(itemPower / 6);
+      const isValuable = itemPower >= 40;
+      
+      if (currentBid < maxTargetBid && botMoney >= currentBid + 1) {
+        shouldBid = true;
+        // Si el objeto es muy bueno, intenta asustar pujando de 2 en 2
+        bidAmount = (isValuable && botMoney >= currentBid + 2) ? 2 : 1;
+      }
+    }
+
+    if (shouldBid && botMoney >= currentBid + bidAmount) {
+      playerBid(2, bidAmount);
+    } else {
+      playerPass(2);
+    }
+  }
+
+  function resolveAuction() {
+    disableAllControls();
+    
+    if (currentBidder === 1) {
+      p1.money -= currentBid;
+      p1.inventory.push(currentItem);
+    } else if (currentBidder === 2) {
+      p2.money -= currentBid;
+      p2.inventory.push(currentItem);
+    }
+
+    updateWalletsAndInventories();
+
+    setTimeout(() => {
+      startNextItemAuction();
+    }, 1200);
+  }
+
   function endGame() {
+    // Si algún jugador se quedó sin objetos (0 objetos), le regalamos los objetos de menor valor del mazo restante
+    if (p1.inventory.length === 0 && activePool.length > 0) {
+      const consolation = activePool.pop();
+      consolation.gifted = true;
+      p1.inventory.push(consolation);
+    }
+    if (p2.inventory.length === 0 && activePool.length > 0) {
+      const consolation = activePool.pop();
+      consolation.gifted = true;
+      p2.inventory.push(consolation);
+    }
+
     document.getElementById('auction-screen').style.display = 'none';
     document.getElementById('results-screen').style.display = 'block';
 
-    const t = I18N[currentLang];
-
+    // Calcular poder total de las colecciones
     const p1Power = p1.inventory.reduce((acc, item) => acc + item.power, 0);
     const p2Power = p2.inventory.reduce((acc, item) => acc + item.power, 0);
 
-    const p1TotalScore = p1Power + p1.money;
-    const p2TotalScore = p2Power + p2.money;
+    // Poder ajustado teniendo en cuenta la economía restante (cada euro sobra suma 1 punto de valor)
+    const p1Score = p1Power + p1.money;
+    const p2Score = p2Power + p2.money;
 
-    const p2Name = gameMode === 'bot' ? t.bot : t.p2;
+    const winnerTitle = document.getElementById('winner-title');
+    const txt = I18N[currentLang];
 
-    let winnerText = "";
-    let reasonText = "";
-
-    if (p1TotalScore > p2TotalScore) {
-      winnerText = gameMode === 'bot' ? "🏆 ¡Has derrotado al SubasBot!" : "🏆 ¡Gana el Jugador 1!";
-      reasonText = `El **Jugador 1** ha obtenido la mejor valoración estratégica global combinando el valor de sus objetos con su dinero ahorrado.`;
-    } else if (p2TotalScore > p1TotalScore) {
-      winnerText = gameMode === 'bot' ? "🤖 ¡El SubasBot ha ganado!" : "🏆 ¡Gana el Jugador 2!";
-      reasonText = `**${p2Name}** ha logrado dominar la subasta reuniendo una colección con mayor puntuación técnica.`;
+    let winnerName = "";
+    if (p1Score > p2Score) {
+      winnerTitle.innerText = txt.winP1;
+      winnerName = txt.p1;
+    } else if (p2Score > p1Score) {
+      winnerTitle.innerText = (gameMode === 'bot') ? txt.winBot : txt.winP2;
+      winnerName = (gameMode === 'bot') ? txt.bot : txt.p2;
     } else {
-      winnerText = t.draw;
-      reasonText = "¡Increíble! Ambos jugadores han empatado con la misma puntuación exacta.";
+      winnerTitle.innerText = txt.draw;
     }
 
-    document.getElementById('winner-title').innerText = winnerText;
-
-    const reportHtml = `
-      <h3 style="color: #f59e0b; margin-bottom: 10px; font-size: 1.3rem;">📊 Análisis de la Partida</h3>
-      <p style="color: var(--text-muted); font-size: 0.95rem;">${reasonText}</p>
-
-      <div class="report-card">
-        <div class="report-row">
-          <span><strong>Jugador 1:</strong> ${p1.inventory.length} Objetos (${p1Power} pts) + ${p1.money} € ahorrados</span>
-          <span style="color: #3b82f6; font-weight: bold; font-size: 1.2rem;">${p1TotalScore} Pts Total</span>
-        </div>
-        <div class="report-row">
-          <span><strong>${p2Name}:</strong> ${p2.inventory.length} Objetos (${p2Power} pts) + ${p2.money} € ahorrados</span>
-          <span style="color: #ef4444; font-weight: bold; font-size: 1.2rem;">${p2TotalScore} Pts Total</span>
-        </div>
-      </div>
-    `;
-
-    document.getElementById('ai-report').innerHTML = reportHtml;
-
+    // Render de resultados finales
     document.getElementById('res-p1-money').innerText = p1.money;
     document.getElementById('res-p2-money').innerText = p2.money;
-
     renderInventory('res-p1-inv', p1.inventory);
     renderInventory('res-p2-inv', p2.inventory);
+
+    // Generar el Informe de la IA sobre la partida
+    generateAIReport(p1Score, p2Score, winnerName);
   }
+
+  function generateAIReport(p1Score, p2Score, winnerName) {
+    const reportBox = document.getElementById('ai-report');
+    const cat = CATEGORIES_DATA[currentCategoryKey];
+    const catTitle = cat.title[currentLang] || cat.title.es;
+
+    let text = "";
+
+    if (currentLang === 'es') {
+      text = `🤖 <strong>Análisis del Perito de SubastIA:</strong><br><br>`;
+      text += `En la temática de <strong>${catTitle}</strong>, `;
+      if (p1Score === p2Score) {
+        text += `ambos participantes han demostrado un equilibrio táctico idéntico, logrando un valor final de <strong>${p1Score} puntos</strong>. ¡Un empate técnico histórico!`;
+      } else {
+        text += `la victoria ha sido asignada a <strong>${winnerName}</strong> con una valoración final de <strong>${Math.max(p1Score, p2Score)} puntos</strong> frente a los <strong>${Math.min(p1Score, p2Score)} puntos</strong> del rival.<br><br>`;
+        text += `<strong>Razón de la Victoria:</strong> ${winnerName} logró optimizar su presupuesto comprando las piezas clave con mejor sinergia y manteniendo una reserva de dinero estratégica al final del lote.`;
+      }
+    } else if (currentLang === 'en') {
+      text = `🤖 <strong>SubastIA Valuation Report:</strong><br><br>`;
+      text += `In the theme <strong>${catTitle}</strong>, `;
+      if (p1Score === p2Score) {
+        text += `both players showed flawless balance, achieving a final score of <strong>${p1Score} pts</strong>. A tie!`;
+      } else {
+        text += `victory goes to <strong>${winnerName}</strong> with <strong>${Math.max(p1Score, p2Score)} pts</strong> against <strong>${Math.min(p1Score, p2Score)} pts</strong>.<br><br>`;
+        text += `<strong>Winning Key:</strong> ${winnerName} managed their budget smoothly, securing higher-tier items while preserving enough cash reserve.`;
+      }
+    } else {
+      text = `🤖 <strong>SubastIA 评估报告:</strong><br><br>`;
+      text += `在 <strong>${catTitle}</strong> 主题拍场中，`;
+      text += `恭喜 <strong>${winnerName}</strong> 赢得胜利！凭借出色的资金管理与高价值收藏组合，掌控了全场节奏。`;
+    }
+
+    reportBox.innerHTML = text;
+  }
+
+  // Inicialización
+  setLanguageText();
 </script>
 </body>
 </html>
