@@ -201,7 +201,7 @@
       <div class="winner-announcement" id="winner-title">🏆 ¡Tenemos Ganador!</div>
       
       <div class="ai-report-box" id="ai-report">
-        <!-- Generado dinámicamente en 3 líneas -->
+        <!-- Generado dinámicamente -->
       </div>
       
       <div class="grid-2">
@@ -356,7 +356,7 @@
         { name: { es: "Reloj Suizo Gold", en: "Gold Swiss Watch", zh: "瑞士金表", ru: "Золотые часы" }, icon: "⌚", desc: { es: "Alta joyería.", en: "High jewelry.", zh: "奢华腕表。", ru: "Роскошь." }, power: 50 },
         { name: { es: "Traje a Medida", en: "Tailored Suit", zh: "定制西装", ru: "Костюм на заказ" }, icon: "👔", desc: { es: "Corte perfecto.", en: "Perfect fit.", zh: "合体剪裁。", ru: "Идеальный крой." }, power: 45 },
         { name: { es: "Zapatillas Edición", en: "Limited Sneakers", zh: "限量球鞋", ru: "Лимитированные кроссовки" }, icon: "👟", desc: { es: "Pieza coleccionable.", en: "Collector's item.", zh: "收藏稀有款。", ru: "Эксклюзив." }, power: 38 },
-        { name: { es: "Gafas de Sol Italia", en: "Italian Sunglasses", zh: "意大利墨镜", ru: "Итальянские очки" }, icon: "🕶️", desc: { es: "Estilo puro.", en: "Pure style.", zh: "时尚范儿。", ru: "Стиль." }, power: 32 },
+        { name: { es: "Gafas de Sol Italia", en: "Italian Sunglasses", zh: "意大利墨镜", ru: "Итальянские очки" }, icon: "🕶️", desc: { es: "Estilo puro.", en: "Pure style.", zh: "时尚范儿。", ru: "时尚范儿。" }, power: 32 },
         { name: { es: "Bolso Exclusivo", en: "Designer Bag", zh: "设计师包包", ru: "Дизайнерская сумка" }, icon: "👜", desc: { es: "Piel auténtica.", en: "Real leather.", zh: "真皮限量。", ru: "Кожа." }, power: 30 }
       ]
     },
@@ -373,7 +373,7 @@
   };
 
   let gameMode = '2p';
-  let botDifficulty = 'novice'; // 'novice', 'medium', 'expert'
+  let botDifficulty = 'novice'; 
   let selectedCategoryKey = 'tridente_futbol';
   let availablePool = [];
   
@@ -381,8 +381,8 @@
   let p2 = { money: 20, inventory: [] };
   
   let currentBid = 0;
-  let highestBidder = 0; // 0, 1 or 2
-  let activeTurn = 1; // 1 or 2
+  let highestBidder = 0; 
+  let activeTurn = 1; 
   let activeItem = null;
   let isSpinning = false;
 
@@ -453,8 +453,8 @@
   function startGame(catKey) {
     selectedCategoryKey = catKey;
     const cat = CATEGORIES_DATA[catKey];
-    availablePool = JSON.parse(JSON.stringify(cat.items));
-    
+    availablePool = [...cat.items];
+
     p1 = { money: 20, inventory: [] };
     p2 = { money: 20, inventory: [] };
 
@@ -462,224 +462,272 @@
     document.getElementById('results-screen').style.display = 'none';
     document.getElementById('auction-screen').style.display = 'block';
     document.getElementById('nav-back-btn').style.display = 'inline-flex';
-    
-    document.getElementById('auction-category-title').innerText = `${cat.icon} ${cat.title[currentLang]}`;
 
-    spinRouletteAndLoadItem();
+    document.getElementById('auction-category-title').innerText = cat.icon + " " + cat.title[currentLang];
+
+    nextItem();
   }
 
-  function spinRouletteAndLoadItem() {
-    if (p1.inventory.length >= 4 && p2.inventory.length >= 4) {
+  function goToMenu() {
+    document.getElementById('menu-screen').style.display = 'block';
+    document.getElementById('auction-screen').style.display = 'none';
+    document.getElementById('results-screen').style.display = 'none';
+    document.getElementById('nav-back-btn').style.display = 'none';
+  }
+
+  function checkFullTeams() {
+    // Si un equipo se llena (4 objetos) y el otro no, el que no está lleno recibe los objetos sobrantes al azar
+    if (p1.inventory.length === 4 && p2.inventory.length < 4) {
+      while (p2.inventory.length < 4 && availablePool.length > 0) {
+        const randIdx = Math.floor(Math.random() * availablePool.length);
+        p2.inventory.push(availablePool.splice(randIdx, 1)[0]);
+      }
+      return true;
+    } else if (p2.inventory.length === 4 && p1.inventory.length < 4) {
+      while (p1.inventory.length < 4 && availablePool.length > 0) {
+        const randIdx = Math.floor(Math.random() * availablePool.length);
+        p1.inventory.push(availablePool.splice(randIdx, 1)[0]);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  function nextItem() {
+    if (checkFullTeams() || availablePool.length === 0 || (p1.inventory.length === 4 && p2.inventory.length === 4)) {
       endGame();
       return;
     }
 
-    if (p1.inventory.length >= 4) {
-      const randIdx = Math.floor(Math.random() * availablePool.length);
-      p2.inventory.push(availablePool.splice(randIdx, 1)[0]);
-      spinRouletteAndLoadItem();
-      return;
-    }
-    if (p2.inventory.length >= 4) {
-      const randIdx = Math.floor(Math.random() * availablePool.length);
-      p1.inventory.push(availablePool.splice(randIdx, 1)[0]);
-      spinRouletteAndLoadItem();
-      return;
-    }
-
     isSpinning = true;
-    const displayBox = document.getElementById('item-display-box');
-    displayBox.classList.add('roulette-spin');
-    
-    let spins = 0;
-    const interval = setInterval(() => {
-      const randomTemp = availablePool[Math.floor(Math.random() * availablePool.length)];
-      document.getElementById('item-icon').innerText = randomTemp.icon;
-      document.getElementById('item-name').innerText = randomTemp.name[currentLang];
-      document.getElementById('item-desc').innerText = I18N[currentLang].spinningDesc;
-      spins++;
+    currentBid = 0;
+    highestBidder = 0;
+    activeTurn = 1;
 
-      if (spins >= 10) {
+    const displayBox = document.getElementById('item-display-box');
+    const iconElem = document.getElementById('item-icon');
+    const nameElem = document.getElementById('item-name');
+    const descElem = document.getElementById('item-desc');
+
+    displayBox.classList.add('roulette-spin');
+    const t = I18N[currentLang];
+    nameElem.innerText = t.spinning;
+    descElem.innerText = t.spinningDesc;
+
+    let counter = 0;
+    const interval = setInterval(() => {
+      const tempItem = availablePool[Math.floor(Math.random() * availablePool.length)];
+      iconElem.innerText = tempItem.icon;
+      counter++;
+      if (counter > 12) {
         clearInterval(interval);
         displayBox.classList.remove('roulette-spin');
         
-        const chosenIndex = Math.floor(Math.random() * availablePool.length);
-        activeItem = availablePool.splice(chosenIndex, 1)[0];
+        const selectedIndex = Math.floor(Math.random() * availablePool.length);
+        activeItem = availablePool.splice(selectedIndex, 1)[0];
 
-        document.getElementById('item-icon').innerText = activeItem.icon;
-        document.getElementById('item-name').innerText = activeItem.name[currentLang];
-        document.getElementById('item-desc').innerText = activeItem.desc[currentLang];
+        iconElem.innerText = activeItem.icon;
+        nameElem.innerText = activeItem.name[currentLang];
+        descElem.innerText = activeItem.desc[currentLang];
 
-        currentBid = 0;
-        highestBidder = 0;
-        activeTurn = 1;
         isSpinning = false;
         updateUI();
-
-        if (gameMode === 'bot' && activeTurn === 2) setTimeout(botDecision, 800);
+        checkBotTurn();
       }
     }, 80);
   }
 
-  function playerBid(player, increment) {
+  function playerBid(player, amount) {
     if (isSpinning || activeTurn !== player) return;
     const p = player === 1 ? p1 : p2;
-    if (currentBid + increment > p.money) return;
 
-    currentBid += increment;
+    if (p.inventory.length >= 4) return;
+    if (p.money < currentBid + amount) return;
+
+    currentBid += amount;
     highestBidder = player;
-    
-    // Cambiar turno al rival
     activeTurn = player === 1 ? 2 : 1;
-    updateUI();
 
-    if (gameMode === 'bot' && activeTurn === 2) {
-      setTimeout(botDecision, 900);
-    }
+    updateUI();
+    checkBotTurn();
   }
 
   function playerPass(player) {
     if (isSpinning || activeTurn !== player) return;
-    
+
     if (highestBidder === 0) {
-      // Si nadie había pujado, el objeto va directamente al rival gratis
-      awardItem(player === 1 ? 2 : 1, 0);
+      activeTurn = player === 1 ? 2 : 1;
+      if (gameMode === 'bot' && activeTurn === 2) {
+        checkBotTurn();
+      } else if (gameMode === '2p' && activeTurn === 1 && highestBidder === 0) {
+        // Los dos pasaron sin pujar
+        nextItem();
+        return;
+      }
+      updateUI();
     } else {
-      // El rival se lleva el objeto pagando la puja máxima
-      awardItem(highestBidder, currentBid);
+      // El jugador pasa y el postor anterior gana el objeto
+      awardItem(highestBidder);
     }
   }
 
-  function awardItem(winner, cost) {
-    if (winner === 1) {
-      p1.money -= cost;
-      p1.inventory.push(activeItem);
-    } else {
-      p2.money -= cost;
-      p2.inventory.push(activeItem);
+  function checkBotTurn() {
+    if (gameMode === 'bot' && activeTurn === 2 && !isSpinning) {
+      setTimeout(botDecision, 1000);
     }
-    spinRouletteAndLoadItem();
   }
 
   function botDecision() {
     if (isSpinning || activeTurn !== 2) return;
 
+    if (p2.inventory.length >= 4) {
+      playerPass(2);
+      return;
+    }
+
     let shouldBid = false;
-    let bidInc = 1;
+    let increment = 1;
+
+    const botMoney = p2.money;
+    const itemValue = activeItem ? activeItem.power : 30;
 
     if (botDifficulty === 'novice') {
-      shouldBid = Math.random() > 0.5 && (currentBid + 1 <= p2.money);
+      shouldBid = Math.random() > 0.5 && botMoney >= currentBid + 1;
     } else if (botDifficulty === 'medium') {
-      const maxVal = Math.floor(activeItem.power / 10);
-      shouldBid = currentBid < maxVal && (currentBid + 1 <= p2.money);
+      shouldBid = itemValue >= 35 && currentBid < 8 && botMoney >= currentBid + 1;
     } else if (botDifficulty === 'expert') {
-      const maxVal = Math.floor(activeItem.power / 8);
-      shouldBid = currentBid < maxVal && (currentBid + 1 <= p2.money);
-      if (activeItem.power >= 45 && currentBid + 2 <= p2.money) bidInc = 2;
+      const maxBid = Math.floor(itemValue / 4);
+      if (currentBid < maxBid && botMoney >= currentBid + 1) {
+        shouldBid = true;
+        if (itemValue >= 45 && botMoney >= currentBid + 2 && Math.random() > 0.4) {
+          increment = 2;
+        }
+      }
     }
 
     if (shouldBid) {
-      playerBid(2, bidInc);
+      playerBid(2, increment);
     } else {
       playerPass(2);
     }
   }
 
-  function updateUI() {
-    const t = I18N[currentLang];
-    document.getElementById('p1-money').innerText = p1.money;
-    document.getElementById('p2-money').innerText = p2.money;
-    document.getElementById('p1-count').innerText = p1.inventory.length;
-    document.getElementById('p2-count').innerText = p2.inventory.length;
-    document.getElementById('current-bid-amount').innerText = `${currentBid} €`;
+  function awardItem(winner) {
+    const winnerObj = winner === 1 ? p1 : p2;
+    winnerObj.money -= currentBid;
+    winnerObj.inventory.push(activeItem);
 
-    let bidderText = t.nobody;
-    if (highestBidder === 1) bidderText = t.p1;
-    if (highestBidder === 2) bidderText = gameMode === 'bot' ? t.bot : t.p2;
-    document.getElementById('current-bidder-name').innerText = bidderText;
+    updateUI();
 
-    // Actualizar indicador de turnos
-    const banner = document.getElementById('turn-banner');
-    if (activeTurn === 1) {
-      banner.className = 'turn-indicator p1-turn';
-      banner.innerText = t.turnP1;
-    } else {
-      banner.className = 'turn-indicator p2-turn';
-      banner.innerText = gameMode === 'bot' ? t.turnBot : t.turnP2;
-    }
-
-    // Estado de habilitación por turnos
-    const p1TurnActive = activeTurn === 1 && !isSpinning;
-    const p2TurnActive = activeTurn === 2 && !isSpinning && gameMode !== 'bot';
-
-    document.getElementById('p1-box').classList.toggle('disabled', !p1TurnActive);
-    document.getElementById('p2-box').classList.toggle('disabled', !p2TurnActive);
-
-    document.getElementById('p1-btn-1').disabled = !p1TurnActive || (currentBid + 1 > p1.money);
-    document.getElementById('p1-btn-2').disabled = !p1TurnActive || (currentBid + 2 > p1.money);
-    document.getElementById('p1-btn-pass').disabled = !p1TurnActive;
-
-    document.getElementById('p2-btn-1').disabled = !p2TurnActive || (currentBid + 1 > p2.money);
-    document.getElementById('p2-btn-2').disabled = !p2TurnActive || (currentBid + 2 > p2.money);
-    document.getElementById('p2-btn-pass').disabled = !p2TurnActive;
-
-    renderInv('p1-inventory', p1.inventory);
-    renderInv('p2-inventory', p2.inventory);
-    document.getElementById('p2-controls').style.display = gameMode === 'bot' ? 'none' : 'flex';
+    setTimeout(() => {
+      nextItem();
+    }, 600);
   }
 
-  function renderInv(elementId, items) {
-    document.getElementById(elementId).innerHTML = items.map(i => `<div class="inv-item"><span>${i.icon}</span> <strong>${i.name[currentLang]}</strong> (${i.power}pts)</div>`).join('');
+  function updateUI() {
+    const t = I18N[currentLang];
+
+    document.getElementById('p1-money').innerText = p1.money;
+    document.getElementById('p2-money').innerText = p2.money;
+
+    document.getElementById('p1-count').innerText = p1.inventory.length;
+    document.getElementById('p2-count').innerText = p2.inventory.length;
+
+    document.getElementById('items-left-count').innerText = `${t.spinningDesc.split('!')[0]}: ${availablePool.length + (activeItem ? 1 : 0)}`;
+
+    // Inventarios
+    renderInventory('p1-inventory', p1.inventory);
+    renderInventory('p2-inventory', p2.inventory);
+
+    // Puja actual
+    document.getElementById('current-bid-amount').innerText = `${currentBid} €`;
+    if (highestBidder === 0) {
+      document.getElementById('current-bidder-name').innerText = t.nobody;
+    } else {
+      document.getElementById('current-bidder-name').innerText = highestBidder === 1 ? t.p1 : (gameMode === 'bot' ? t.bot : t.p2);
+    }
+
+    // Turnos
+    const turnBanner = document.getElementById('turn-banner');
+    if (activeTurn === 1) {
+      turnBanner.className = "turn-indicator p1-turn";
+      turnBanner.innerText = t.turnP1;
+      document.getElementById('p1-box').classList.remove('disabled');
+      document.getElementById('p2-box').classList.add('disabled');
+    } else {
+      turnBanner.className = "turn-indicator p2-turn";
+      turnBanner.innerText = gameMode === 'bot' ? t.turnBot : t.turnP2;
+      document.getElementById('p2-box').classList.remove('disabled');
+      document.getElementById('p1-box').classList.add('disabled');
+    }
+
+    // Deshabilitar botones si no hay dinero o inventario lleno
+    document.getElementById('p1-btn-1').disabled = (activeTurn !== 1 || p1.money < currentBid + 1 || p1.inventory.length >= 4);
+    document.getElementById('p1-btn-2').disabled = (activeTurn !== 1 || p1.money < currentBid + 2 || p1.inventory.length >= 4);
+    document.getElementById('p1-btn-pass').disabled = (activeTurn !== 1);
+
+    const isBot = gameMode === 'bot';
+    document.getElementById('p2-btn-1').disabled = (isBot || activeTurn !== 2 || p2.money < currentBid + 1 || p2.inventory.length >= 4);
+    document.getElementById('p2-btn-2').disabled = (isBot || activeTurn !== 2 || p2.money < currentBid + 2 || p2.inventory.length >= 4);
+    document.getElementById('p2-btn-pass').disabled = (isBot || activeTurn !== 2);
+  }
+
+  function renderInventory(elementId, items) {
+    const container = document.getElementById(elementId);
+    container.innerHTML = '';
+    items.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'inv-item';
+      div.innerHTML = `<span>${item.icon}</span> <span>${item.name[currentLang]}</span>`;
+      container.appendChild(div);
+    });
   }
 
   function endGame() {
     document.getElementById('auction-screen').style.display = 'none';
     document.getElementById('results-screen').style.display = 'block';
 
-    const p1Val = p1.inventory.reduce((acc, i) => acc + i.power, 0);
-    const p2Val = p2.inventory.reduce((acc, i) => acc + i.power, 0);
-    const p1Score = p1Val + p1.money;
-    const p2Score = p2Val + p2.money;
+    const p1Power = p1.inventory.reduce((sum, item) => sum + item.power, 0) + p1.money;
+    const p2Power = p2.inventory.reduce((sum, item) => sum + item.power, 0) + p2.money;
+
+    const p1ItemsPower = p1.inventory.reduce((sum, item) => sum + item.power, 0);
+    const p2ItemsPower = p2.inventory.reduce((sum, item) => sum + item.power, 0);
+
     const t = I18N[currentLang];
+    const winnerTitle = document.getElementById('winner-title');
+    const aiReport = document.getElementById('ai-report');
 
-    let winnerName = t.p1;
-    if (p2Score > p1Score) winnerName = gameMode === 'bot' ? t.bot : t.p2;
+    let winnerText = "";
+    let reasonText = "";
 
-    if (p1Score > p2Score) {
-      document.getElementById('winner-title').innerText = t.winP1;
-    } else if (p2Score > p1Score) {
-      document.getElementById('winner-title').innerText = gameMode === 'bot' ? t.winBot : t.winP2;
+    const nameP2 = gameMode === 'bot' ? t.bot : t.p2;
+
+    if (p1Power > p2Power) {
+      winnerText = t.winP1;
+      reasonText = `<strong>${t.p1}</strong> es superior con una puntuación total de <strong>${p1Power} pts</strong> (Poder de objetos: ${p1ItemsPower} + Dinero restante: ${p1.money}€) frente a los <strong>${p2Power} pts</strong> de ${nameP2}.`;
+    } else if (p2Power > p1Power) {
+      winnerText = gameMode === 'bot' ? t.winBot : t.winP2;
+      reasonText = `<strong>${nameP2}</strong> es superior con una puntuación total de <strong>${p2Power} pts</strong> (Poder de objetos: ${p2ItemsPower} + Dinero restante: ${p2.money}€) frente a los <strong>${p1Power} pts</strong> de ${t.p1}.`;
     } else {
-      document.getElementById('winner-title').innerText = t.draw;
+      winnerText = t.draw;
+      reasonText = `¡Ambos jugadores han obtenido un rendimiento idéntico con <strong>${p1Power} pts</strong> totales!`;
     }
 
-    // Explicación de la IA estructurada estrictamente en 3 líneas
-    const line1 = `📊 <strong>Línea 1 - Colección ${t.p1}:</strong> Consiguió ${p1.inventory.length} objetos (${p1Val} pts) y guardó ${p1.money} € en efectivo (Total: ${p1Score} pts).`;
-    const line2 = `📊 <strong>Línea 2 - Colección ${gameMode === 'bot' ? t.bot : t.p2}:</strong> Consiguió ${p2.inventory.length} objetos (${p2Val} pts) y guardó ${p2.money} € en efectivo (Total: ${p2Score} pts).`;
-    const line3 = p1Score === p2Score 
-      ? `🤖 <strong>Línea 3 - Veredicto IA:</strong> ¡Empate perfecto! Ambas estrategias demostraron un equilibrio idéntico entre compras y presupuesto.`
-      : `🤖 <strong>Línea 3 - Veredicto IA:</strong> ${winnerName} gana gracias a un diferencial de ${Math.abs(p1Score - p2Score)} puntos combinando valor de lote y ahorro monetario.`;
-
-    document.getElementById('ai-report').innerHTML = `
-      <div class="ai-report-line">${line1}</div>
-      <div class="ai-report-line">${line2}</div>
-      <div class="ai-report-line">${line3}</div>
+    winnerTitle.innerText = winnerText;
+    
+    aiReport.innerHTML = `
+      <div class="ai-report-line">🏆 <strong>Resultado:</strong> ${winnerText}</div>
+      <div class="ai-report-line">📊 <strong>Explicación de Superioridad:</strong> ${reasonText}</div>
+      <div class="ai-report-line">💡 <strong>Colección ${t.p1}:</strong> ${p1.inventory.map(i => i.icon + ' ' + i.name[currentLang]).join(', ') || 'Ninguno'}</div>
+      <div class="ai-report-line">💡 <strong>Colección ${nameP2}:</strong> ${p2.inventory.map(i => i.icon + ' ' + i.name[currentLang]).join(', ') || 'Ninguno'}</div>
     `;
 
     document.getElementById('res-p1-money').innerText = p1.money;
     document.getElementById('res-p2-money').innerText = p2.money;
 
-    renderInv('res-p1-inv', p1.inventory);
-    renderInv('res-p2-inv', p2.inventory);
-  }
-
-  function goToMenu() {
-    document.getElementById('auction-screen').style.display = 'none';
-    document.getElementById('results-screen').style.display = 'none';
-    document.getElementById('menu-screen').style.display = 'block';
-    document.getElementById('nav-back-btn').style.display = 'none';
+    renderInventory('res-p1-inv', p1.inventory);
+    renderInventory('res-p2-inv', p2.inventory);
   }
 </script>
-
 </body>
 </html>
