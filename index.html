@@ -130,6 +130,7 @@
           <button class="diff-btn selected" id="diff-novice" onclick="selectDifficulty('novice')">🟢 <span id="txt-diff-novice">Novato</span></button>
           <button class="diff-btn" id="diff-medium" onclick="selectDifficulty('medium')">🟡 <span id="txt-diff-medium">Medio</span></button>
           <button class="diff-btn" id="diff-expert" onclick="selectDifficulty('expert')">🔴 <span id="txt-diff-expert">Experto</span></button>
+          <button class="diff-btn" id="diff-impossible" onclick="selectDifficulty('impossible')">💀 <span id="txt-diff-impossible">Imposible</span></button>
         </div>
       </div>
     </div>
@@ -240,7 +241,7 @@
     es: {
       subtitle: "Compite, puja estratégicamente y crea la colección perfecta",
       back: "Volver", step1: "1. Elige Modo de Juego", mode2p: "2 Jugadores (Local)", modeBot: "1 Jugador vs SubasBot",
-      diffLabel: "Dificultad del Bot:", diffNovice: "Novato", diffMedium: "Medio", diffExpert: "Experto",
+      diffLabel: "Dificultad del Bot:", diffNovice: "Novato", diffMedium: "Medio", diffExpert: "Experto", diffImpossible: "Imposible",
       step2: "2. Elige la Temática", spinning: "GIRANDO RULETA...", spinningDesc: "¡Buscando el siguiente objeto al azar!",
       currentBid: "Puja Actual", bidderLabel: "Postor", nobody: "Nadie", p1: "Jugador 1", p2: "Jugador 2", bot: "SubasBot 🤖",
       pass: "Pasar", yourItems: "Tus Objetos", theirItems: "Sus Objetos", playAgain: "Jugar Otra Partida",
@@ -250,7 +251,7 @@
     en: {
       subtitle: "Compete, bid strategically and create the perfect collection",
       back: "Back", step1: "1. Choose Game Mode", mode2p: "2 Players (Local)", modeBot: "1 Player vs SubasBot",
-      diffLabel: "Bot Difficulty:", diffNovice: "Novice", diffMedium: "Medium", diffExpert: "Expert",
+      diffLabel: "Bot Difficulty:", diffNovice: "Novice", diffMedium: "Medium", diffExpert: "Expert", diffImpossible: "Impossible",
       step2: "2. Choose Theme", spinning: "SPINNING ROULETTE...", spinningDesc: "Searching for the next random item!",
       currentBid: "Current Bid", bidderLabel: "High Bidder", nobody: "Nobody", p1: "Player 1", p2: "Player 2", bot: "SubasBot 🤖",
       pass: "Pass", yourItems: "Your Items", theirItems: "Their Items", playAgain: "Play Again",
@@ -260,7 +261,7 @@
     zh: {
       subtitle: "策略竞拍，打造属于你的完美收藏",
       back: "返回", step1: "1. 选择游戏模式", mode2p: "双人本地对战", modeBot: "单人 vs 拍卖机器人",
-      diffLabel: "机器人难度:", diffNovice: "新手", diffMedium: "中等", diffExpert: "专家",
+      diffLabel: "机器人难度:", diffNovice: "新手", diffMedium: "中等", diffExpert: "专家", diffImpossible: "地狱",
       step2: "2. 选择主题", spinning: "轮盘旋转中...", spinningDesc: "正在随机抽取下一个拍品！",
       currentBid: "当前出价", bidderLabel: "最高出价者", nobody: "暂无", p1: "玩家 1", p2: "玩家 2", bot: "拍卖机器人 🤖",
       pass: "放弃", yourItems: "你的物品", theirItems: "对方物品", playAgain: "再玩一局",
@@ -270,7 +271,7 @@
     ru: {
       subtitle: "Соревнуйтесь, делайте ставки и соберите лучшую коллекцию",
       back: "Назад", step1: "1. Выберите режим игры", mode2p: "2 Игрока (Локально)", modeBot: "1 Игрок против СубасБота",
-      diffLabel: "Сложность бота:", diffNovice: "Новичок", diffMedium: "Средний", diffExpert: "Эксперт",
+      diffLabel: "Сложность бота:", diffNovice: "Новичок", diffMedium: "Средний", diffExpert: "Эксперт", diffImpossible: "Невозможно",
       step2: "2. Выберите тему", spinning: "ВРАЩЕНИЕ РУЛЕТКИ...", spinningDesc: "Случайный выбор следующего предмета!",
       currentBid: "Текущая ставка", bidderLabel: "Покупатель", nobody: "Никто", p1: "Игрок 1", p2: "Игрок 2", bot: "СубасБот 🤖",
       pass: "Пас", yourItems: "Ваши предметы", theirItems: "Соперник", playAgain: "Сыграть снова",
@@ -557,6 +558,7 @@
     document.getElementById('txt-diff-novice').innerText = t.diffNovice;
     document.getElementById('txt-diff-medium').innerText = t.diffMedium;
     document.getElementById('txt-diff-expert').innerText = t.diffExpert;
+    document.getElementById('txt-diff-impossible').innerText = t.diffImpossible;
     document.getElementById('txt-step2').innerText = t.step2;
 
     document.getElementById('txt-current-bid').innerText = t.currentBid;
@@ -699,19 +701,66 @@
     }
   }
 
+  // Calcula cuanto esta dispuesto a pagar el bot IMPOSIBLE por el objeto actual.
+  // Mira todo lo que queda por subastar, solo pelea por lo mejor y reserva
+  // monedas para los objetos buenos que aun estan por salir.
+  function impossibleMaxBid() {
+    const slotsNeeded = 4 - p2.inventory.length;
+    if (slotsNeeded <= 0) return 0;
+
+    // Objetos que quedan por subastar, incluyendo el actual.
+    const pool = deck.concat([currentItem]).map(it => it.power).sort((a, b) => b - a);
+    const myPower = currentItem.power;
+    const rank = pool.filter(pw => pw > myPower).length; // 0 = el mejor que queda
+
+    // Objetos futuros (sin contar el actual) que son mejores que este.
+    const betterLater = deck.filter(it => it.power > myPower).length;
+
+    // Si no hay suficientes objetos para llenar el inventario, hay que cogerlo si o si.
+    const mustTake = deck.length < slotsNeeded;
+
+    // Es "bueno" si esta entre los mejores que quedan por repartir.
+    const isTop = rank < slotsNeeded;
+    // Es basura si hay de sobra por delante mejores que este.
+    const isJunk = betterLater >= slotsNeeded + 1;
+
+    // Reservamos monedas para los objetos buenos que todavia estan por venir.
+    const futureTargets = Math.min(slotsNeeded - 1, betterLater);
+    const reserve = Math.min(p2.money, futureTargets * 4);
+
+    if (mustTake) return Math.max(1, p2.money - (slotsNeeded - 1));
+    if (isTop) return Math.max(1, p2.money - reserve);
+
+    // Objeto por encima de la media de lo que queda: solo lo compra a precio de ganga.
+    const median = pool[Math.floor(pool.length / 2)];
+    if (myPower >= median && !isJunk) {
+      return Math.max(0, Math.min(Math.floor(p2.money / slotsNeeded), p2.money - reserve));
+    }
+    return 0; // ni una moneda en tonterias
+  }
+
   function botTurn() {
     if (passedPlayers.has(2)) return;
 
     let willBid = false;
     let increment = 1;
 
-    const diffFactor = botDifficulty === 'expert' ? 0.8 : (botDifficulty === 'medium' ? 0.6 : 0.4);
-    const itemVal = (currentItem.power / 100) * 10;
+    if (botDifficulty === 'impossible') {
+      const maxBid = impossibleMaxBid();
+      // Siempre sube lo minimo posible: gana el objeto gastando lo justo.
+      if (p2.inventory.length < 4 && p2.money >= currentBid + 1 && currentBid + 1 <= maxBid) {
+        willBid = true;
+        increment = 1;
+      }
+    } else {
+      const diffFactor = botDifficulty === 'expert' ? 0.8 : (botDifficulty === 'medium' ? 0.6 : 0.4);
+      const itemVal = (currentItem.power / 100) * 10;
 
-    if (p2.money > currentBid + 1 && currentBid < itemVal * diffFactor && p2.inventory.length < 4) {
-      willBid = true;
-      if (botDifficulty === 'expert' && Math.random() > 0.5 && p2.money >= currentBid + 2) {
-        increment = 2;
+      if (p2.money > currentBid + 1 && currentBid < itemVal * diffFactor && p2.inventory.length < 4) {
+        willBid = true;
+        if (botDifficulty === 'expert' && Math.random() > 0.5 && p2.money >= currentBid + 2) {
+          increment = 2;
+        }
       }
     }
 
